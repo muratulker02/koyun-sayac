@@ -1,21 +1,38 @@
-"""Koyun Sayacı arayüzü. Çalıştır: .venv/bin/python app.py  →  http://127.0.0.1:8780"""
+"""Koyun Sayacı arayüzü. Çalıştır: .venv/bin/python app.py  →  http://127.0.0.1:8780
+
+İki kip:
+  • İzleme  — kamera bütün gün açık; her çıkış/giriş günün defterine yazılır, dışarıda kalan
+              anlık görünür, son koyun girince ve akşam kontrol saatinde Telegram'a rapor gider.
+  • Demo    — hazır videolarla deneme; deftere yazmaz, gerçek sayı biliniyorsa doğruluğu gösterir.
+"""
 import json
+import threading
 import time
+from datetime import date, datetime
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, request, send_from_directory
 
+import defter
 from bildir import gonder
-from defter import deftere_yaz, gecmis
 from motor import Motor
 
 KOK = Path(__file__).parent
 AYAR = KOK / "ayarlar.json"
-VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False}
+DEMO = KOK / "test-video"
+VIDEO_KAYIT = KOK / "kayitlar" / "video"
+VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False,
+              "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True}
+
+
+def model_yolu():
+    ozel = KOK / "modeller" / "koyun-tepeden.pt"
+    return str(ozel if ozel.exists() else KOK / "modeller" / "yolo11s.pt")
+
 
 app = Flask(__name__, static_folder=str(KOK / "arayuz"))
-motor = Motor(str(KOK / "modeller" / "yolo11s.pt"))
-oturum = {"ad": None, "mesaj": ""}
+motor = Motor(model_yolu())
+durum = {"kip": None, "demo": None, "son": (0, 0), "mesaj": ""}
 
 
 def ayarlar():
@@ -40,28 +57,79 @@ def env_oku():
     return d
 
 
+def demo_bilgi():
+    f = DEMO / "demolar.json"
+    return json.loads(f.read_text()) if f.exists() else {}
+
+
 def demolar():
-    return sorted(p.name for p in (KOK / "test-video").glob("*.mp4") if not p.name.startswith("sonuc-"))
+    bilgi = demo_bilgi()
+    adlar = sorted(p.name for p in DEMO.glob("*.mp4"))
+    return [{"ad": ad, **bilgi.get(ad, {})} for ad in adlar]
 
 
-def oturum_kaydedici(ad):
-    """Sayım bitince (video sonu ya da 'Bitir') o oturumu deftere yazar."""
-    def kaydet(ozet):
-        a = ayarlar()
-        oturum["mesaj"] = deftere_yaz(ad, {"cikan": ozet["cikan"], "giren": ozet["giren"]},
-                                      a["suru"], a["tolerans"])
-        oturum["ad"] = None
-    return kaydet if ad else None
+# --- bekçi: sayaç farkını deftere yazar, bildirimleri yönetir ---
+def izleme_baslat():
+    a = ayarlar()
+    if not a["kamera"]:
+        return False
+    durum.update(kip="izleme", demo=None, son=(0, 0), mesaj="")
+    motor.model_yolu = model_yolu()
+    motor.cizgi_ayarla(a["cizgi"], a["yon_ters"])
+    motor.baslat(a["kamera"], gercek_hiz=False,
+                 kayit_klasoru=VIDEO_KAYIT if a["video_kaydet"] else None)
+    return True
 
 
+def bekci():
+    gun = date.today()
+    while True:
+        time.sleep(1)
+        try:
+            a = ayarlar()
+            if durum["kip"] == "izleme" and motor.sayac:
+                c, g = motor.sayac.cikan, motor.sayac.giren
+                sc, sg = durum["son"]
+                if (c, g) != (sc, sg):
+                    once = defter.oku()
+                    k = defter.ekle(max(0, c - sc), max(0, g - sg))
+                    durum["son"] = (c, g)
+                    # son koyun da girdi → hemen haber ver (günde bir kez)
+                    if (defter.disarida(once) > a["tolerans"] >= defter.disarida(k)
+                            and k["cikan"] > 0 and not k.get("tamam_bildirildi")):
+                        gonder(f"✅ Hepsi içeride ({datetime.now():%H:%M}): {k['cikan']} çıktı, {k['giren']} girdi")
+                        k["tamam_bildirildi"] = True
+                        defter._yaz(k)
+            # gün değişti → sayaç farkı sıfırdan
+            if date.today() != gun:
+                gun = date.today()
+                if motor.sayac:
+                    durum["son"] = (motor.sayac.cikan, motor.sayac.giren)
+            # akşam kontrol saati
+            k = defter.oku()
+            if datetime.now().strftime("%H:%M") >= a["rapor_saati"] and not k.get("rapor"):
+                metin = defter.rapor_metni(k, a["suru"], a["tolerans"])
+                if durum["kip"] != "izleme" and not (k["cikan"] or k["giren"]):
+                    metin = "ℹ️ Bugün izleme kapalıydı, sayım yapılmadı."
+                gonder(f"🐑 Akşam kontrolü {a['rapor_saati']}\n{metin}")
+                defter.rapor_kaydet(metin)
+            # kamera ayarlıysa ve otomatik başlatma açıksa izleme hep açık kalsın
+            if (a["otomatik_baslat"] and a["kamera"] and durum["kip"] is None
+                    and motor.durum in ("bekliyor", "bitti", "hata")):
+                izleme_baslat()
+        except Exception as e:  # bekçi asla ölmesin
+            print("bekçi hatası:", e)
+
+
+# --- sayfalar ---
 @app.get("/")
 def ana():
     return send_from_directory(app.static_folder, "index.html")
 
 
-@app.get("/demo/<ad>")
-def demo_dosya(ad):
-    return send_from_directory(KOK / "test-video", ad)
+@app.get("/kayit/<ad>")
+def kayit_video(ad):
+    return send_from_directory(VIDEO_KAYIT, ad)
 
 
 @app.get("/akis")
@@ -78,41 +146,69 @@ def akis():
 
 
 @app.get("/api/durum")
-def durum():
+def api_durum():
     a = ayarlar()
     e = env_oku()
-    return jsonify({**motor.ozet(), "oturum": oturum["ad"], "mesaj": oturum["mesaj"],
-                    "ayarlar": a, "demolar": demolar(), "gecmis": gecmis(),
-                    "goruntu": motor.jpeg is not None,
+    bugun = defter.oku()
+    videolar = sorted((p.name for p in VIDEO_KAYIT.glob(f"{date.today().isoformat()}_*.mp4")), reverse=True) \
+        if VIDEO_KAYIT.exists() else []
+    return jsonify({**motor.ozet(), "kip": durum["kip"], "demo": durum["demo"], "mesaj": durum["mesaj"],
+                    "goruntu": motor.jpeg is not None, "ayarlar": a, "demolar": demolar(),
+                    "bugun": {k: v for k, v in bugun.items() if k != "olaylar"},
+                    "olaylar": bugun["olaylar"][-8:][::-1], "disarida": defter.disarida(bugun),
+                    "gecmis": defter.gecmis(), "videolar": videolar,
+                    "model": Path(motor.model_yolu).name,
                     "telegram": bool(e.get("TELEGRAM_TOKEN") and e.get("TELEGRAM_CHAT_ID"))})
 
 
-@app.post("/api/baslat")
-def baslat():
+@app.post("/api/izleme")
+def api_izleme():
+    if not izleme_baslat():
+        return jsonify({"hata": "Önce Ayarlar'dan kamera adresini girin."}), 400
+    return jsonify({"ok": True})
+
+
+@app.post("/api/demo")
+def api_demo():
     d = request.json or {}
+    ad = d["demo"]
+    bilgi = demo_bilgi().get(ad, {})
     a = ayarlar()
-    if d.get("tur") == "demo":
-        kaynak, gercek_hiz = str(KOK / "test-video" / d["demo"]), d.get("gercek_hiz", True)
-    else:
-        if not a["kamera"]:
-            return jsonify({"hata": "Önce Ayarlar'dan kamera adresini girin."}), 400
-        kaynak, gercek_hiz = a["kamera"], False
-    oturum["ad"] = d.get("oturum")  # sabah | aksam | None (sadece test)
-    oturum["mesaj"] = ""
-    motor.cizgi_ayarla(a["cizgi"], a["yon_ters"])
-    motor.baslat(kaynak, gercek_hiz=gercek_hiz, bitince=oturum_kaydedici(oturum["ad"]))
+
+    def bitti(ozet):
+        g = bilgi.get("gercek")
+        sayilan = ozet["giren"] + ozet["cikan"]
+        if g:
+            hata = sayilan - g
+            durum["mesaj"] = (f"Demo bitti — gerçek {g}, sayılan {sayilan} → "
+                              + ("✅ hatasız" if hata == 0 else f"{hata:+d} fark (doğruluk %{100 * (1 - abs(hata) / g):.1f})"))
+        else:
+            durum["mesaj"] = f"Demo bitti — {ozet['cikan']} çıkış, {ozet['giren']} giriş sayıldı."
+
+    durum.update(kip="demo", demo=ad, son=(0, 0), mesaj="")
+    motor.model_yolu = model_yolu()
+    motor.cizgi_ayarla(bilgi.get("cizgi", a["cizgi"]), bilgi.get("yon_ters", a["yon_ters"]))
+    motor.baslat(str(DEMO / ad), gercek_hiz=d.get("gercek_hiz", True), bitince=bitti)
     return jsonify({"ok": True})
 
 
 @app.post("/api/durdur")
-def durdur():
-    """Bitir: oturum açıksa o ana kadarki sayı deftere yazılır (motor iş parçacığı yazar)."""
+def api_durdur():
     motor.durdur()
-    return jsonify({"ok": True, "mesaj": oturum["mesaj"]})
+    durum["kip"] = None if durum["kip"] == "demo" else "durduruldu"
+    return jsonify({"ok": True})
+
+
+@app.post("/api/rapor")
+def api_rapor():
+    a = ayarlar()
+    metin = defter.rapor_metni(defter.oku(), a["suru"], a["tolerans"])
+    gonder(f"🐑 Anlık durum {datetime.now():%H:%M}\n{metin}")
+    return jsonify({"ok": True, "metin": metin})
 
 
 @app.post("/api/cizgi")
-def cizgi():
+def api_cizgi():
     d = request.json or {}
     a = ayarlar()
     if "cizgi" in d:
@@ -125,14 +221,18 @@ def cizgi():
 
 
 @app.post("/api/ayarlar")
-def ayarlar_kaydet():
+def api_ayarlar():
     d = request.json or {}
     a = ayarlar()
     for k in ("suru", "tolerans"):
-        if k in d:
+        if k in d and str(d[k]).strip() != "":
             a[k] = int(d[k])
-    if "kamera" in d:
-        a["kamera"] = d["kamera"].strip()
+    for k in ("kamera", "rapor_saati"):
+        if k in d:
+            a[k] = str(d[k]).strip()
+    for k in ("otomatik_baslat", "video_kaydet"):
+        if k in d:
+            a[k] = bool(d[k])
     ayar_kaydet(a)
     if d.get("telegram_token") or d.get("telegram_chat"):
         e = env_oku()
@@ -145,9 +245,10 @@ def ayarlar_kaydet():
 
 
 @app.post("/api/telegram-test")
-def telegram_test():
+def api_telegram_test():
     return jsonify({"ok": gonder("🐑 Koyun Sayacı test mesajı — bildirimler çalışıyor.")})
 
 
 if __name__ == "__main__":
+    threading.Thread(target=bekci, daemon=True).start()
     app.run(host="127.0.0.1", port=8780, threaded=True)

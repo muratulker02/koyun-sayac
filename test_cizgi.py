@@ -51,3 +51,12 @@ def test_cok_hayvan():
         yuru(s, tid, [80, 120])
     yuru(s, 9999, [120, 80])
     assert (s.cikan, s.giren) == (700, 1)
+
+
+def test_supheli_yarim_kalan_iz():
+    s = CizgiSayaci(A, B)
+    yuru(s, 1, [20, 40, 60, 80, 95])        # çizgiye yaklaştı, geçmeden kayboldu
+    yuru(s, 2, [20, 40, 60, 80, 95, 120])   # geçti
+    yuru(s, 3, [20, 21, 20, 22, 20])        # yerinde durdu → şüpheli değil
+    assert s.supheli(aktif_idler=set()) == [1]
+    assert s.supheli(aktif_idler={1}) == []  # hâlâ ekranda → henüz şüpheli değil

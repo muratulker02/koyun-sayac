@@ -2,8 +2,7 @@
 
 Örnekler:
   python say.py test-video/NmMb.mp4 --cizgi 0.5,0,0.5,1 --kayit cikti.mp4
-  python say.py rtsp://kullanici:sifre@192.168.1.64/stream1 --oturum sabah
-  python say.py rtsp://... --oturum aksam      # sabahla karşılaştırır, Telegram'a yazar
+  (Günlük izleme/rapor için arayüzü kullanın: python app.py)
 
 --cizgi: x1,y1,x2,y2 görüntüye oranla (0-1). Çizginin "solu"ndan "sağı"na geçen = çıkış.
 Yön ters çıkarsa --yon-ters ekle.
@@ -17,7 +16,6 @@ import cv2
 from ultralytics import YOLO
 
 from cizgi import CizgiSayaci
-from defter import deftere_yaz
 
 KOK = Path(__file__).parent
 KOYUN = 18  # COCO sınıfı: sheep
@@ -35,7 +33,7 @@ def say(a):
     kare = 0
     t0 = time.time()
     akis = model.track(source=a.kaynak, stream=True, persist=True, tracker=a.takip,
-                       classes=[int(s) for s in a.siniflar.split(",")],
+                       classes=None if len(model.names) == 1 else [int(s) for s in a.siniflar.split(",")],
                        conf=a.guven, imgsz=a.boyut, device=a.cihaz, verbose=False)
     for r in akis:
         h, w = r.orig_shape
@@ -79,15 +77,10 @@ def main():
     p.add_argument("--kayit", help="işaretli video çıktısı (.mp4)")
     p.add_argument("--fps", type=float, default=25)
     p.add_argument("--sure", type=float, help="dakika sonra dur (canlı kamera için)")
-    p.add_argument("--oturum", choices=["sabah", "aksam"])
-    p.add_argument("--beklenen", type=int, default=0, help="sürü büyüklüğü (ör. 700)")
-    p.add_argument("--tolerans", type=int, default=0)
     a = p.parse_args()
 
     sonuc = say(a)
     print(json.dumps(sonuc, ensure_ascii=False))
-    if a.oturum:
-        print(deftere_yaz(a.oturum, sonuc, a.beklenen, a.tolerans))
 
 
 if __name__ == "__main__":

@@ -3,4 +3,13 @@
 modeller/
 test-video/
 kayitlar/
+veri/icaerus/
+veri/kareler/
+veri/egitim-*/
+egitimler/
+*.log
 *.mp4
+*.png
+*.jpg
+aday/
+ayarlar.json

@@ -8,7 +8,7 @@
   :root{
     --bg:#f4f1ea; --kart:#fffdf8; --metin:#1f2a1c; --soluk:#6b7365; --cizgi:#e3ddd0;
     --yesil:#2f7d3b; --yesil-a:#e3f1e2; --kirmizi:#c0392b; --kirmizi-a:#fbe5e1;
-    --mavi:#1f5f8b; --sari:#b7791f; --golge:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+    --mavi:#1f5f8b; --sari:#b7791f; --sari-a:#fbf1dc; --golge:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--metin);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -16,6 +16,7 @@
   header h1{font-size:20px;margin:0}
   .rozet{font-size:13px;padding:3px 10px;border-radius:99px;background:#eee;color:var(--soluk)}
   .rozet.calisiyor{background:var(--yesil-a);color:var(--yesil)}
+  .rozet.baglaniyor{background:var(--sari-a);color:var(--sari)}
   .rozet.hata{background:var(--kirmizi-a);color:var(--kirmizi)}
   main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;padding:18px 22px;max-width:1400px;margin:0 auto}
   @media (max-width:980px){main{grid-template-columns:1fr}}
@@ -24,7 +25,10 @@
   .sayac{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;padding:12px 16px;box-shadow:var(--golge)}
   .sayac small{display:block;color:var(--soluk);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
   .sayac b{font-size:44px;font-variant-numeric:tabular-nums;line-height:1.1}
+  .sayac .alt{font-size:12px;color:var(--soluk)}
   .sayac.cik b{color:var(--mavi)} .sayac.gir b{color:var(--yesil)}
+  .sayac.dis.var{background:var(--kirmizi-a);border-color:#f0c8c0} .sayac.dis.var b{color:var(--kirmizi)}
+  .sayac.dis.yok b{color:var(--yesil)}
   .ekran{position:relative;background:#1b1f19;border-radius:12px;overflow:hidden;min-height:300px;display:flex;align-items:center;justify-content:center}
   .ekran img{display:block;width:100%;height:auto}
   .ekran canvas{position:absolute;inset:0;width:100%;height:100%;cursor:default}
@@ -43,10 +47,11 @@
   .yan{display:flex;flex-direction:column;gap:14px}
   .demo{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--cizgi)}
   .demo:first-of-type{border-top:0}
-  .demo span{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .demo button{padding:6px 10px;font-size:13px}
+  .demo .ad{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .demo .ad small{display:block;color:var(--soluk);font-size:11px}
+  .demo button{padding:6px 10px;font-size:13px;flex-shrink:0}
   label{display:block;font-size:13px;color:var(--soluk);margin:10px 0 4px}
-  input[type=text],input[type=number],input[type=password]{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--cizgi);border-radius:8px;background:#fff}
+  input[type=text],input[type=number],input[type=password],input[type=time]{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--cizgi);border-radius:8px;background:#fff}
   .mesaj{display:none;margin-bottom:14px;padding:14px 16px;border-radius:12px;font-weight:600;font-size:16px}
   .mesaj.iyi{display:block;background:var(--yesil-a);color:var(--yesil)}
   .mesaj.kotu{display:block;background:var(--kirmizi-a);color:var(--kirmizi)}
@@ -57,6 +62,12 @@
   td.sayi{font-variant-numeric:tabular-nums}
   details summary{cursor:pointer;font-weight:600}
   .kucuk{font-size:12px;color:var(--soluk)}
+  .satir{display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .olay{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-top:1px dashed var(--cizgi)}
+  .olay:first-child{border-top:0}
+  .kayit{display:inline-block;margin:3px 6px 3px 0;font-size:13px;color:var(--mavi)}
+  .nokta{display:inline-block;width:9px;height:9px;border-radius:50%;background:#bbb;margin-right:6px}
+  .nokta.on{background:var(--yesil);box-shadow:0 0 0 3px var(--yesil-a)}
 </style>
 </head>
 <body>
@@ -64,20 +75,21 @@
   <h1>🐑 Koyun Sayacı</h1>
   <span id="rozet" class="rozet">bekliyor</span>
   <span id="bilgi" class="kucuk"></span>
+  <span id="modelBilgi" class="kucuk" style="margin-left:auto"></span>
 </header>
 
 <main>
   <section>
     <div id="mesaj" class="mesaj"></div>
     <div class="sayaclar">
-      <div class="sayac cik"><small>Çıkan</small><b id="cikan">0</b></div>
-      <div class="sayac gir"><small>Giren</small><b id="giren">0</b></div>
-      <div class="sayac"><small id="farkEtiket">Bugün eksik</small><b id="fark">–</b></div>
+      <div class="sayac cik"><small>Bugün çıkan</small><b id="cikan">0</b><div class="alt" id="ilkCikis"></div></div>
+      <div class="sayac gir"><small>Bugün giren</small><b id="giren">0</b><div class="alt" id="sonGiris"></div></div>
+      <div class="sayac dis" id="disKart"><small>Şu an dışarıda</small><b id="disarida">–</b><div class="alt" id="disAlt"></div></div>
     </div>
 
     <div class="kart">
       <div id="ekran" class="ekran">
-        <div id="bos" class="bos">Görüntü yok.<br>Sağdan bir <b>demo</b> seçin ya da <b>sabah / akşam sayımını</b> başlatın.</div>
+        <div id="bos" class="bos">Görüntü yok.<br>Ayarlar'dan kamerayı girin ya da sağdan bir <b>demo</b> deneyin.</div>
         <img id="akis" alt="" style="display:none">
         <canvas id="tuval"></canvas>
       </div>
@@ -89,9 +101,15 @@
     </div>
 
     <div class="kart" style="margin-top:18px">
+      <div class="satir"><h2>Bugünkü geçişler</h2><span class="kucuk" id="olaySayi"></span></div>
+      <div id="olaylar" class="kucuk">Henüz geçiş yok.</div>
+      <div id="kayitlar" style="margin-top:10px"></div>
+    </div>
+
+    <div class="kart" style="margin-top:18px">
       <h2>Son günler</h2>
       <table>
-        <thead><tr><th>Tarih</th><th>Sabah çıkan</th><th>Akşam giren</th><th>Durum</th></tr></thead>
+        <thead><tr><th>Tarih</th><th>Çıkan</th><th>Giren</th><th>Akşam raporu</th></tr></thead>
         <tbody id="gecmis"><tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr></tbody>
       </table>
     </div>
@@ -99,26 +117,19 @@
 
   <aside class="yan">
     <div class="kart">
-      <h2>Bugünkü sayım</h2>
-      <div class="kucuk">Kamera: <span id="kameraDurum">ayarlanmadı</span></div>
-      <button class="buyuk mavi" data-oturum="sabah">🌅 Sabah çıkışını say</button>
-      <button class="buyuk ana" data-oturum="aksam">🌙 Akşam girişini say</button>
-      <button id="durBtn" class="buyuk dur" disabled>■ Bitir ve kaydet</button>
+      <h2><span id="izNokta" class="nokta"></span>Kamera izleme</h2>
+      <div class="kucuk" id="kameraDurum">Kamera ayarlanmadı.</div>
+      <button class="buyuk ana" id="izleBtn">▶ İzlemeyi başlat</button>
+      <button class="buyuk dur" id="durBtn" disabled>■ Durdur</button>
+      <button class="buyuk" id="raporBtn">📨 Şimdi durum raporu gönder</button>
+      <div class="kucuk" style="margin-top:8px">Akşam <b id="raporSaat">19:30</b>'da rapor otomatik gider.</div>
     </div>
 
     <div class="kart">
       <h2>Demo testler</h2>
-      <div class="kucuk" style="margin-bottom:6px">Hazır videolarla deneyin. Kayda geçmez.</div>
+      <div class="kucuk" style="margin-bottom:6px">Gerçek sayısı bilinen videolarda doğruluk ölçülür. Deftere yazmaz.</div>
       <div id="demolar"></div>
       <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="hizli"> Hızlı oynat</label>
-      <details style="margin-top:8px"><summary class="kucuk">Demoyu sabah/akşam gibi kaydet</summary>
-        <div class="kucuk" style="margin:6px 0">Tüm akışı (karşılaştırma + bildirim) denemek için.</div>
-        <select id="demoOturum" style="font:inherit;padding:6px;border-radius:8px;border:1px solid var(--cizgi)">
-          <option value="">Kaydetme (sadece izle)</option>
-          <option value="sabah">Sabah çıkışı say</option>
-          <option value="aksam">Akşam girişi say</option>
-        </select>
-      </details>
     </div>
 
     <div class="kart">
@@ -130,6 +141,10 @@
         <input id="tolerans" type="number" min="0">
         <label>Kamera adresi (RTSP)</label>
         <input id="kamera" type="text" placeholder="rtsp://kullanici:sifre@192.168.1.64:554/stream1">
+        <label>Akşam kontrol saati</label>
+        <input id="raporSaati" type="time">
+        <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="otomatik"> Program açılınca izleme kendiliğinden başlasın</label>
+        <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="videoKaydet"> Geçiş videolarını saatlik kaydet</label>
         <label>Telegram bot anahtarı</label>
         <input id="tgToken" type="password" placeholder="değiştirmek için yazın">
         <label>Telegram sohbet no</label>
@@ -166,14 +181,12 @@ function cizgiCiz(){
   tuval.width = r.width; tuval.height = r.height;
   ctx.clearRect(0, 0, r.width, r.height);
   if (!D) return;
-  const [x1, y1, x2, y2] = ciziyor && noktalar.length === 2
-    ? [...noktalar[0], ...noktalar[1]] : D.ayarlar.cizgi;
+  const [x1, y1, x2, y2] = ciziyor && noktalar.length === 2 ? [...noktalar[0], ...noktalar[1]] : D.cizgi;
   const A = [x1 * r.width, y1 * r.height], B = [x2 * r.width, y2 * r.height];
   ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,80,80,.9)"; ctx.setLineDash(ciziyor ? [8,6] : []);
   ctx.beginPath(); ctx.moveTo(...A); ctx.lineTo(...B); ctx.stroke(); ctx.setLineDash([]);
-  // çıkış yönü oku (sol taraftan sağa)
   let dx = B[1] - A[1], dy = -(B[0] - A[0]);
-  if (D.ayarlar.yon_ters) { dx = -dx; dy = -dy; }
+  if (D.yon_ters) { dx = -dx; dy = -dy; }
   const n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n;
   const M = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2], L = 46;
   const S = [M[0] - dx * L, M[1] - dy * L], E = [M[0] + dx * L, M[1] + dy * L];
@@ -202,25 +215,24 @@ tuval.onclick = async e => {
     $("#cizBtn").click(); await yenile();
   }
 };
-$("#yonBtn").onclick = async () => { await api("/api/cizgi", {yon_ters: !D.ayarlar.yon_ters}); await yenile(); };
+$("#yonBtn").onclick = async () => { await api("/api/cizgi", {yon_ters: !D.yon_ters}); await yenile(); };
 
-document.querySelectorAll("[data-oturum]").forEach(b => b.onclick = async () => {
-  const r = await api("/api/baslat", {tur: "kamera", oturum: b.dataset.oturum});
+$("#izleBtn").onclick = async () => {
+  const r = await api("/api/izleme", {});
   if (r.hata) return goster(r.hata, "kotu");
-  goster(b.dataset.oturum === "sabah" ? "Sabah çıkışı sayılıyor… Bitince 'Bitir ve kaydet'e basın." : "Akşam girişi sayılıyor… Bitince 'Bitir ve kaydet'e basın.", "bilgi");
-  akisAc();
-});
+  goster("Kamera izleniyor. Her geçiş anında sayılır.", "bilgi"); akisAc();
+};
 $("#durBtn").onclick = async () => { await api("/api/durdur", {}); yenile(); };
+$("#raporBtn").onclick = async () => { const r = await api("/api/rapor", {}); goster("Gönderildi: " + r.metin, r.metin.includes("⚠️") ? "kotu" : "iyi"); };
 
 async function demoBaslat(ad){
-  const oturum = $("#demoOturum").value || null;
-  await api("/api/baslat", {tur: "demo", demo: ad, oturum, gercek_hiz: !$("#hizli").checked});
-  goster(oturum ? `Demo "${ad}" ${oturum === "sabah" ? "sabah çıkışı" : "akşam girişi"} olarak sayılıyor…` : `Demo "${ad}" oynatılıyor…`, "bilgi");
-  akisAc();
+  await api("/api/demo", {demo: ad, gercek_hiz: !$("#hizli").checked});
+  goster(`Demo "${ad}" oynatılıyor…`, "bilgi"); akisAc();
 }
 
 $("#kaydetBtn").onclick = async () => {
   await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
+    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked,
     telegram_token: $("#tgToken").value, telegram_chat: $("#tgChat").value});
   $("#tgToken").value = $("#tgChat").value = "";
   $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
@@ -232,45 +244,54 @@ $("#tgTestBtn").onclick = async () => {
 
 function goster(metin, tur){ const m = $("#mesaj"); m.textContent = metin; m.className = "mesaj " + tur; }
 
-const DURUM = {bekliyor: "bekliyor", calisiyor: "sayıyor", bitti: "bitti", hata: "hata"};
+const DURUM = {bekliyor: "bekliyor", calisiyor: "sayıyor", baglaniyor: "kameraya bağlanıyor…", bitti: "bitti", hata: "hata"};
 let sonMesaj = "";
 async function yenile(){
   D = await api("/api/durum");
-  $("#cikan").textContent = D.cikan; $("#giren").textContent = D.giren;
+  const b = D.bugun, izleme = D.kip === "izleme";
+  $("#cikan").textContent = b.cikan; $("#giren").textContent = b.giren;
+  $("#ilkCikis").textContent = b.ilk_cikis ? "ilk çıkış " + b.ilk_cikis : "";
+  $("#sonGiris").textContent = b.son_giris ? "son giriş " + b.son_giris : "";
+  const dis = D.disarida, kart = $("#disKart");
+  if (b.cikan || b.giren) {
+    $("#disarida").textContent = dis; kart.className = "sayac dis " + (dis > D.ayarlar.tolerans ? "var" : "yok");
+    $("#disAlt").textContent = dis > D.ayarlar.tolerans ? "⚠️ eksik var" : (dis < 0 ? "fazla giriş?" : "✓ hepsi içeride");
+  } else { $("#disarida").textContent = "–"; kart.className = "sayac dis"; $("#disAlt").textContent = ""; }
+
   const rz = $("#rozet"); rz.textContent = DURUM[D.durum] || D.durum; rz.className = "rozet " + D.durum;
-  $("#bilgi").textContent = D.durum === "calisiyor" ? `ekranda ${D.kutu} koyun · ${D.fps} kare/sn` : (D.hata ? "Hata: " + D.hata : "");
-  $("#durBtn").disabled = D.durum !== "calisiyor";
+  $("#bilgi").textContent = D.durum === "calisiyor"
+    ? `${D.kip === "demo" ? `demo: ${D.cikan} çıktı, ${D.giren} girdi · ` : ""}ekranda ${D.kutu} koyun · ${D.izlenen} numara verildi${D.supheli ? ` · ⚠️ ${D.supheli} şüpheli` : ""} · ${D.fps} kare/sn`
+    : (D.hata ? "Hata: " + D.hata : "");
+  $("#modelBilgi").textContent = "model: " + D.model;
+  $("#durBtn").disabled = !["calisiyor", "baglaniyor"].includes(D.durum);
+  $("#izleBtn").disabled = izleme && D.durum !== "hata";
+  $("#izNokta").className = "nokta " + (izleme && D.durum === "calisiyor" ? "on" : "");
+  $("#kameraDurum").textContent = !D.ayarlar.kamera ? "Kamera ayarlanmadı (Ayarlar'dan girin)." : izleme ? "Kamera izleniyor." : "Kamera ayarlı, izleme kapalı.";
+  $("#raporSaat").textContent = D.ayarlar.rapor_saati;
   if (D.goruntu) akisAc();
-  $("#kameraDurum").textContent = D.ayarlar.kamera ? "ayarlı" : "ayarlanmadı (Ayarlar'dan girin)";
 
-  const bugun = D.gecmis.find(g => g.tarih === new Date().toLocaleDateString("sv"));
-  if (bugun && bugun.sabah && bugun.aksam) {
-    const f = bugun.sabah.cikan - bugun.aksam.giren;
-    $("#fark").textContent = f > D.ayarlar.tolerans ? f : "0 ✓";
-    $("#fark").style.color = f > D.ayarlar.tolerans ? "var(--kirmizi)" : "var(--yesil)";
-  } else { $("#fark").textContent = "–"; $("#fark").style.color = ""; }
+  if (D.mesaj && D.mesaj !== sonMesaj) { sonMesaj = D.mesaj; goster(D.mesaj, D.mesaj.includes("✅") ? "iyi" : D.mesaj.includes("fark") ? "kotu" : "bilgi"); }
 
-  if (D.mesaj && D.mesaj !== sonMesaj) {
-    sonMesaj = D.mesaj; goster(D.mesaj, D.mesaj.includes("EKSİK") ? "kotu" : D.mesaj.includes("✅") ? "iyi" : "bilgi");
-  } else if (D.durum === "bitti" && $("#mesaj").classList.contains("bilgi") && !D.oturum) {
-    goster(`Bitti: ${D.cikan} çıkış, ${D.giren} giriş sayıldı.`, "bilgi");
-  }
+  $("#olaySayi").textContent = D.olaylar.length ? "son " + D.olaylar.length : "";
+  $("#olaylar").innerHTML = D.olaylar.length ? D.olaylar.map(([s, c, g]) =>
+    `<div class="olay"><span>${s}</span><span>${c ? `<b style="color:var(--mavi)">↑ ${c} çıktı</b>` : ""} ${g ? `<b style="color:var(--yesil)">↓ ${g} girdi</b>` : ""}</span></div>`).join("")
+    : "Henüz geçiş yok.";
+  $("#kayitlar").innerHTML = D.videolar.length ? "<span class='kucuk'>Video kayıtları: </span>" + D.videolar.map(v => `<a class="kayit" href="/kayit/${v}" target="_blank">🎞 ${v.slice(11, 13)}:00</a>`).join("") : "";
 
   if (!ayarYuklendi) {
-    $("#suru").value = D.ayarlar.suru; $("#tolerans").value = D.ayarlar.tolerans; $("#kamera").value = D.ayarlar.kamera;
+    const a = D.ayarlar;
+    $("#suru").value = a.suru; $("#tolerans").value = a.tolerans; $("#kamera").value = a.kamera;
+    $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
     $("#tgChat").placeholder = D.telegram ? "ayarlı — değiştirmek için yazın" : "ör. 123456789";
-    $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><span title="${d}">${d}</span><button data-demo="${d}">▶ Test et</button></div>`).join("")
+    $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
     document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));
     ayarYuklendi = true;
   }
 
-  $("#gecmis").innerHTML = D.gecmis.length ? D.gecmis.map(g => {
-    const c = g.sabah?.cikan, gi = g.aksam?.giren;
-    let d = "–";
-    if (c != null && gi != null) d = c - gi > D.ayarlar.tolerans ? `<b style="color:var(--kirmizi)">⚠️ ${c - gi} eksik</b>` : `<span style="color:var(--yesil)">✅ tamam</span>`;
-    return `<tr><td>${g.tarih}</td><td class="sayi">${c ?? "–"}</td><td class="sayi">${gi ?? "–"}</td><td>${d}</td></tr>`;
-  }).join("") : '<tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr>';
+  $("#gecmis").innerHTML = D.gecmis.length ? D.gecmis.map(g =>
+    `<tr><td>${g.tarih}</td><td class="sayi">${g.cikan}</td><td class="sayi">${g.giren}</td><td>${g.rapor || "–"}</td></tr>`).join("")
+    : '<tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr>';
   cizgiCiz();
 }
 yenile(); setInterval(yenile, 700);

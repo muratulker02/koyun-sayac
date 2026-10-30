@@ -29,10 +29,14 @@ class CizgiSayaci:
         self.yon_ters = yon_ters
         self.son_nokta = {}   # id -> son merkez
         self.katki = {}       # id -> net katkı (+1 çıktı, -1 girdi, 0)
+        self.gorulme = {}     # id -> kaç karede görüldü
+        self.ilk_nokta = {}   # id -> ilk merkez
 
     def guncelle(self, tid, nokta):
         onceki = self.son_nokta.get(tid)
         self.son_nokta[tid] = nokta
+        self.gorulme[tid] = self.gorulme.get(tid, 0) + 1
+        self.ilk_nokta.setdefault(tid, nokta)
         if onceki is None or not _kesisir(onceki, nokta, self.a, self.b):
             return None
         sol_dan_saga = _taraf(onceki, self.a, self.b) > 0
@@ -48,3 +52,23 @@ class CizgiSayaci:
     @property
     def giren(self):
         return sum(1 for k in self.katki.values() if k < 0)
+
+    def sayildi_mi(self, tid):
+        return self.katki.get(tid, 0) != 0
+
+    def supheli(self, aktif_idler, en_az_kare=5, yaklasma=0.35):
+        """Görülüp çizgiyi geçmeden kaybolan izler: olası kaçırma.
+
+        aktif_idler: şu an ekranda olan id'ler (bunlar henüz kaybolmadı).
+        yaklasma: ilk görüldüğü noktaya göre çizgiye bu oranda yaklaşmış olmalı
+        (yerinde duran ya da ilgisiz izler sayılmaz).
+        """
+        sup = []
+        for tid, n in self.gorulme.items():
+            if tid in aktif_idler or n < en_az_kare or self.sayildi_mi(tid):
+                continue
+            d_ilk = abs(_taraf(self.ilk_nokta[tid], self.a, self.b))
+            d_son = abs(_taraf(self.son_nokta[tid], self.a, self.b))
+            if d_ilk > 0 and d_son < d_ilk * (1 - yaklasma):
+                sup.append(tid)
+        return sup
