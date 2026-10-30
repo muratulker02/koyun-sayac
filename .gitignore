@@ -1,0 +1,6 @@
+.venv/
+.env
+modeller/
+test-video/
+kayitlar/
+*.mp4

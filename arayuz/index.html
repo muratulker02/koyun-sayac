@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koyun Sayacı</title>
+<style>
+  :root{
+    --bg:#f4f1ea; --kart:#fffdf8; --metin:#1f2a1c; --soluk:#6b7365; --cizgi:#e3ddd0;
+    --yesil:#2f7d3b; --yesil-a:#e3f1e2; --kirmizi:#c0392b; --kirmizi-a:#fbe5e1;
+    --mavi:#1f5f8b; --sari:#b7791f; --golge:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--metin);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--cizgi);background:var(--kart)}
+  header h1{font-size:20px;margin:0}
+  .rozet{font-size:13px;padding:3px 10px;border-radius:99px;background:#eee;color:var(--soluk)}
+  .rozet.calisiyor{background:var(--yesil-a);color:var(--yesil)}
+  .rozet.hata{background:var(--kirmizi-a);color:var(--kirmizi)}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;padding:18px 22px;max-width:1400px;margin:0 auto}
+  @media (max-width:980px){main{grid-template-columns:1fr}}
+  .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;box-shadow:var(--golge);padding:16px}
+  .sayaclar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+  .sayac{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;padding:12px 16px;box-shadow:var(--golge)}
+  .sayac small{display:block;color:var(--soluk);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .sayac b{font-size:44px;font-variant-numeric:tabular-nums;line-height:1.1}
+  .sayac.cik b{color:var(--mavi)} .sayac.gir b{color:var(--yesil)}
+  .ekran{position:relative;background:#1b1f19;border-radius:12px;overflow:hidden;min-height:300px;display:flex;align-items:center;justify-content:center}
+  .ekran img{display:block;width:100%;height:auto}
+  .ekran canvas{position:absolute;inset:0;width:100%;height:100%;cursor:default}
+  .ekran.ciziyor canvas{cursor:crosshair}
+  .bos{color:#cfd5c8;text-align:center;padding:40px}
+  .arac{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .ipucu{color:var(--soluk);font-size:13px}
+  button{font:inherit;border:1px solid var(--cizgi);background:#fff;color:var(--metin);border-radius:10px;padding:9px 14px;cursor:pointer}
+  button:hover{border-color:#bdb5a3}
+  button.ana{background:var(--yesil);border-color:var(--yesil);color:#fff;font-weight:600}
+  button.mavi{background:var(--mavi);border-color:var(--mavi);color:#fff;font-weight:600}
+  button.dur{background:var(--kirmizi);border-color:var(--kirmizi);color:#fff;font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .buyuk{width:100%;padding:14px;font-size:16px;margin-top:8px}
+  h2{font-size:15px;margin:0 0 10px}
+  .yan{display:flex;flex-direction:column;gap:14px}
+  .demo{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--cizgi)}
+  .demo:first-of-type{border-top:0}
+  .demo span{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .demo button{padding:6px 10px;font-size:13px}
+  label{display:block;font-size:13px;color:var(--soluk);margin:10px 0 4px}
+  input[type=text],input[type=number],input[type=password]{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--cizgi);border-radius:8px;background:#fff}
+  .mesaj{display:none;margin-bottom:14px;padding:14px 16px;border-radius:12px;font-weight:600;font-size:16px}
+  .mesaj.iyi{display:block;background:var(--yesil-a);color:var(--yesil)}
+  .mesaj.kotu{display:block;background:var(--kirmizi-a);color:var(--kirmizi)}
+  .mesaj.bilgi{display:block;background:#e8f0f6;color:var(--mavi)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 6px;border-top:1px solid var(--cizgi)}
+  th{color:var(--soluk);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.05em;border-top:0}
+  td.sayi{font-variant-numeric:tabular-nums}
+  details summary{cursor:pointer;font-weight:600}
+  .kucuk{font-size:12px;color:var(--soluk)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐑 Koyun Sayacı</h1>
+  <span id="rozet" class="rozet">bekliyor</span>
+  <span id="bilgi" class="kucuk"></span>
+</header>
+
+<main>
+  <section>
+    <div id="mesaj" class="mesaj"></div>
+    <div class="sayaclar">
+      <div class="sayac cik"><small>Çıkan</small><b id="cikan">0</b></div>
+      <div class="sayac gir"><small>Giren</small><b id="giren">0</b></div>
+      <div class="sayac"><small id="farkEtiket">Bugün eksik</small><b id="fark">–</b></div>
+    </div>
+
+    <div class="kart">
+      <div id="ekran" class="ekran">
+        <div id="bos" class="bos">Görüntü yok.<br>Sağdan bir <b>demo</b> seçin ya da <b>sabah / akşam sayımını</b> başlatın.</div>
+        <img id="akis" alt="" style="display:none">
+        <canvas id="tuval"></canvas>
+      </div>
+      <div class="arac">
+        <button id="cizBtn">✏️ Sayma çizgisini çiz</button>
+        <button id="yonBtn">⇄ Yönü çevir</button>
+        <span id="cizIpucu" class="ipucu">Kırmızı çizgiyi ok yönünde geçen <b>çıkış</b>, tersi <b>giriş</b> sayılır.</span>
+      </div>
+    </div>
+
+    <div class="kart" style="margin-top:18px">
+      <h2>Son günler</h2>
+      <table>
+        <thead><tr><th>Tarih</th><th>Sabah çıkan</th><th>Akşam giren</th><th>Durum</th></tr></thead>
+        <tbody id="gecmis"><tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <aside class="yan">
+    <div class="kart">
+      <h2>Bugünkü sayım</h2>
+      <div class="kucuk">Kamera: <span id="kameraDurum">ayarlanmadı</span></div>
+      <button class="buyuk mavi" data-oturum="sabah">🌅 Sabah çıkışını say</button>
+      <button class="buyuk ana" data-oturum="aksam">🌙 Akşam girişini say</button>
+      <button id="durBtn" class="buyuk dur" disabled>■ Bitir ve kaydet</button>
+    </div>
+
+    <div class="kart">
+      <h2>Demo testler</h2>
+      <div class="kucuk" style="margin-bottom:6px">Hazır videolarla deneyin. Kayda geçmez.</div>
+      <div id="demolar"></div>
+      <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="hizli"> Hızlı oynat</label>
+      <details style="margin-top:8px"><summary class="kucuk">Demoyu sabah/akşam gibi kaydet</summary>
+        <div class="kucuk" style="margin:6px 0">Tüm akışı (karşılaştırma + bildirim) denemek için.</div>
+        <select id="demoOturum" style="font:inherit;padding:6px;border-radius:8px;border:1px solid var(--cizgi)">
+          <option value="">Kaydetme (sadece izle)</option>
+          <option value="sabah">Sabah çıkışı say</option>
+          <option value="aksam">Akşam girişi say</option>
+        </select>
+      </details>
+    </div>
+
+    <div class="kart">
+      <details>
+        <summary>⚙️ Ayarlar</summary>
+        <label>Sürüdeki hayvan sayısı</label>
+        <input id="suru" type="number" min="0">
+        <label>Tolerans (bu kadar farka alarm verme)</label>
+        <input id="tolerans" type="number" min="0">
+        <label>Kamera adresi (RTSP)</label>
+        <input id="kamera" type="text" placeholder="rtsp://kullanici:sifre@192.168.1.64:554/stream1">
+        <label>Telegram bot anahtarı</label>
+        <input id="tgToken" type="password" placeholder="değiştirmek için yazın">
+        <label>Telegram sohbet no</label>
+        <input id="tgChat" type="text" placeholder="değiştirmek için yazın">
+        <div class="arac">
+          <button class="ana" id="kaydetBtn">Kaydet</button>
+          <button id="tgTestBtn">Telegram'ı dene</button>
+        </div>
+        <div id="ayarSonuc" class="kucuk" style="margin-top:6px"></div>
+      </details>
+    </div>
+  </aside>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = (yol, govde) => fetch(yol, govde === undefined ? {} : {
+  method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(govde)
+}).then(r => r.json());
+
+let D = null, ciziyor = false, noktalar = [], akisAcik = false, ayarYuklendi = false;
+const img = $("#akis"), tuval = $("#tuval"), ctx = tuval.getContext("2d");
+
+function akisAc(){
+  if (akisAcik) return;
+  img.src = "/akis?" + Date.now();
+  img.style.display = "block"; $("#bos").style.display = "none";
+  akisAcik = true;
+}
+img.onload = cizgiCiz;
+
+function cizgiCiz(){
+  const r = img.style.display === "none" ? $("#ekran").getBoundingClientRect() : img.getBoundingClientRect();
+  tuval.width = r.width; tuval.height = r.height;
+  ctx.clearRect(0, 0, r.width, r.height);
+  if (!D) return;
+  const [x1, y1, x2, y2] = ciziyor && noktalar.length === 2
+    ? [...noktalar[0], ...noktalar[1]] : D.ayarlar.cizgi;
+  const A = [x1 * r.width, y1 * r.height], B = [x2 * r.width, y2 * r.height];
+  ctx.lineWidth = 3; ctx.strokeStyle = "rgba(255,80,80,.9)"; ctx.setLineDash(ciziyor ? [8,6] : []);
+  ctx.beginPath(); ctx.moveTo(...A); ctx.lineTo(...B); ctx.stroke(); ctx.setLineDash([]);
+  // çıkış yönü oku (sol taraftan sağa)
+  let dx = B[1] - A[1], dy = -(B[0] - A[0]);
+  if (D.ayarlar.yon_ters) { dx = -dx; dy = -dy; }
+  const n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n;
+  const M = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2], L = 46;
+  const S = [M[0] - dx * L, M[1] - dy * L], E = [M[0] + dx * L, M[1] + dy * L];
+  ctx.strokeStyle = ctx.fillStyle = "#ffd34d"; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(...S); ctx.lineTo(...E); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(E[0] + dx * 10, E[1] + dy * 10);
+  ctx.lineTo(E[0] - dy * 9, E[1] + dx * 9); ctx.lineTo(E[0] + dy * 9, E[1] - dx * 9); ctx.fill();
+  ctx.font = "bold 14px system-ui"; ctx.fillText("ÇIKIŞ", E[0] + dx * 16 - 20, E[1] + dy * 16 - 8);
+}
+addEventListener("resize", cizgiCiz);
+
+$("#cizBtn").onclick = () => {
+  ciziyor = !ciziyor; noktalar = [];
+  $("#ekran").classList.toggle("ciziyor", ciziyor);
+  $("#cizBtn").textContent = ciziyor ? "✖ Vazgeç" : "✏️ Sayma çizgisini çiz";
+  $("#cizIpucu").innerHTML = ciziyor ? "Görüntüde <b>iki noktaya</b> tıklayın (kapının bir ucu, diğer ucu)."
+    : "Kırmızı çizgiyi ok yönünde geçen <b>çıkış</b>, tersi <b>giriş</b> sayılır.";
+  cizgiCiz();
+};
+tuval.onclick = async e => {
+  if (!ciziyor) return;
+  const r = tuval.getBoundingClientRect();
+  noktalar.push([(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]);
+  if (noktalar.length === 2) {
+    await api("/api/cizgi", {cizgi: [...noktalar[0], ...noktalar[1]]});
+    $("#cizBtn").click(); await yenile();
+  }
+};
+$("#yonBtn").onclick = async () => { await api("/api/cizgi", {yon_ters: !D.ayarlar.yon_ters}); await yenile(); };
+
+document.querySelectorAll("[data-oturum]").forEach(b => b.onclick = async () => {
+  const r = await api("/api/baslat", {tur: "kamera", oturum: b.dataset.oturum});
+  if (r.hata) return goster(r.hata, "kotu");
+  goster(b.dataset.oturum === "sabah" ? "Sabah çıkışı sayılıyor… Bitince 'Bitir ve kaydet'e basın." : "Akşam girişi sayılıyor… Bitince 'Bitir ve kaydet'e basın.", "bilgi");
+  akisAc();
+});
+$("#durBtn").onclick = async () => { await api("/api/durdur", {}); yenile(); };
+
+async function demoBaslat(ad){
+  const oturum = $("#demoOturum").value || null;
+  await api("/api/baslat", {tur: "demo", demo: ad, oturum, gercek_hiz: !$("#hizli").checked});
+  goster(oturum ? `Demo "${ad}" ${oturum === "sabah" ? "sabah çıkışı" : "akşam girişi"} olarak sayılıyor…` : `Demo "${ad}" oynatılıyor…`, "bilgi");
+  akisAc();
+}
+
+$("#kaydetBtn").onclick = async () => {
+  await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
+    telegram_token: $("#tgToken").value, telegram_chat: $("#tgChat").value});
+  $("#tgToken").value = $("#tgChat").value = "";
+  $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
+};
+$("#tgTestBtn").onclick = async () => {
+  const r = await api("/api/telegram-test", {});
+  $("#ayarSonuc").textContent = r.ok ? "Telegram mesajı gönderildi ✓" : "Gönderilemedi — bot anahtarını ve sohbet numarasını kontrol edin.";
+};
+
+function goster(metin, tur){ const m = $("#mesaj"); m.textContent = metin; m.className = "mesaj " + tur; }
+
+const DURUM = {bekliyor: "bekliyor", calisiyor: "sayıyor", bitti: "bitti", hata: "hata"};
+let sonMesaj = "";
+async function yenile(){
+  D = await api("/api/durum");
+  $("#cikan").textContent = D.cikan; $("#giren").textContent = D.giren;
+  const rz = $("#rozet"); rz.textContent = DURUM[D.durum] || D.durum; rz.className = "rozet " + D.durum;
+  $("#bilgi").textContent = D.durum === "calisiyor" ? `ekranda ${D.kutu} koyun · ${D.fps} kare/sn` : (D.hata ? "Hata: " + D.hata : "");
+  $("#durBtn").disabled = D.durum !== "calisiyor";
+  if (D.goruntu) akisAc();
+  $("#kameraDurum").textContent = D.ayarlar.kamera ? "ayarlı" : "ayarlanmadı (Ayarlar'dan girin)";
+
+  const bugun = D.gecmis.find(g => g.tarih === new Date().toLocaleDateString("sv"));
+  if (bugun && bugun.sabah && bugun.aksam) {
+    const f = bugun.sabah.cikan - bugun.aksam.giren;
+    $("#fark").textContent = f > D.ayarlar.tolerans ? f : "0 ✓";
+    $("#fark").style.color = f > D.ayarlar.tolerans ? "var(--kirmizi)" : "var(--yesil)";
+  } else { $("#fark").textContent = "–"; $("#fark").style.color = ""; }
+
+  if (D.mesaj && D.mesaj !== sonMesaj) {
+    sonMesaj = D.mesaj; goster(D.mesaj, D.mesaj.includes("EKSİK") ? "kotu" : D.mesaj.includes("✅") ? "iyi" : "bilgi");
+  } else if (D.durum === "bitti" && $("#mesaj").classList.contains("bilgi") && !D.oturum) {
+    goster(`Bitti: ${D.cikan} çıkış, ${D.giren} giriş sayıldı.`, "bilgi");
+  }
+
+  if (!ayarYuklendi) {
+    $("#suru").value = D.ayarlar.suru; $("#tolerans").value = D.ayarlar.tolerans; $("#kamera").value = D.ayarlar.kamera;
+    $("#tgChat").placeholder = D.telegram ? "ayarlı — değiştirmek için yazın" : "ör. 123456789";
+    $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><span title="${d}">${d}</span><button data-demo="${d}">▶ Test et</button></div>`).join("")
+      || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
+    document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));
+    ayarYuklendi = true;
+  }
+
+  $("#gecmis").innerHTML = D.gecmis.length ? D.gecmis.map(g => {
+    const c = g.sabah?.cikan, gi = g.aksam?.giren;
+    let d = "–";
+    if (c != null && gi != null) d = c - gi > D.ayarlar.tolerans ? `<b style="color:var(--kirmizi)">⚠️ ${c - gi} eksik</b>` : `<span style="color:var(--yesil)">✅ tamam</span>`;
+    return `<tr><td>${g.tarih}</td><td class="sayi">${c ?? "–"}</td><td class="sayi">${gi ?? "–"}</td><td>${d}</td></tr>`;
+  }).join("") : '<tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr>';
+  cizgiCiz();
+}
+yenile(); setInterval(yenile, 700);
+</script>
+</body>
+</html>
