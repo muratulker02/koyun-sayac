@@ -1,1 +1,3 @@
 ## --guven 0.25 --boyut 960
+TOPLAM: gerçek 160  sayılan 160  hata +0  doğruluk %100.0
+## --guven 0.10 --boyut 960

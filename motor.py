@@ -35,6 +35,7 @@ class Motor:
         self.kutu = 0
         self.supheli = []
         self.bitince = None
+        self.log = print          # app bunu defter.sistem_log'a bağlar
         self.kayit_klasoru = None
         self._yazici = None
         self._yazici_saat = None
@@ -162,6 +163,8 @@ class Motor:
         try:
             model = YOLO(self.model_yolu)
             siniflar = None if len(model.names) == 1 else [KOYUN_COCO]
+            if self._canli_mi():
+                self.log(f"KAMERA bağlanılıyor: {self.kaynak}")
             while not self.dur_bayragi:
                 try:
                     self._bir_tur(model, siniflar, tur)
@@ -172,6 +175,7 @@ class Motor:
                 if self.dur_bayragi or not self._canli_mi():
                     break
                 # canlı kamera bitti/koptu → bekle ve yeniden bağlan, sayım korunur
+                self.log("KAMERA koptu, 5 sn sonra yeniden bağlanılacak" + (f" ({self.hata})" if self.hata else ""))
                 self.durum = "baglaniyor"
                 tur += 1
                 model = YOLO(self.model_yolu)

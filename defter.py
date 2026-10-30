@@ -9,7 +9,24 @@ from pathlib import Path
 
 KOK = Path(__file__).parent
 KLASOR = KOK / "kayitlar"
+CSV = KLASOR / "gecisler.csv"      # her geçiş: tarih,saat,çıkan,giren,dışarıda  (Excel'de açılır)
+SISTEM = KLASOR / "sistem.log"     # kamera koptu/bağlandı, rapor gitti, program açıldı
 _kilit = threading.Lock()
+
+
+def sistem_log(mesaj):
+    """Sistem olayını hem dosyaya hem ekrana yazar."""
+    KLASOR.mkdir(exist_ok=True)
+    satir = f"{datetime.now():%Y-%m-%d %H:%M:%S}  {mesaj}"
+    with SISTEM.open("a") as f:
+        f.write(satir + "\n")
+    print(satir, flush=True)
+
+
+def son_sistem(n=30):
+    if not SISTEM.exists():
+        return []
+    return SISTEM.read_text().splitlines()[-n:][::-1]
 
 
 def _dosya(gun=None):
@@ -45,6 +62,11 @@ def ekle(cikan=0, giren=0):
         if giren:
             k["son_giris"] = saat[:5]
         _yaz(k)
+        yeni = not CSV.exists()
+        with CSV.open("a") as f:
+            if yeni:
+                f.write("tarih;saat;cikan;giren;disarida\n")
+            f.write(f"{date.today().isoformat()};{saat};{cikan};{giren};{disarida(k)}\n")
         return k
 
 
@@ -70,6 +92,7 @@ def rapor_kaydet(metin):
         k["rapor"] = metin
         k["rapor_saat"] = datetime.now().strftime("%H:%M")
         _yaz(k)
+    sistem_log("RAPOR " + metin)
 
 
 def gecmis(gun=14):

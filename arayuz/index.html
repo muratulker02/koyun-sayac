@@ -140,20 +140,39 @@
         <label>Tolerans (bu kadar farka alarm verme)</label>
         <input id="tolerans" type="number" min="0">
         <label>Kamera adresi (RTSP)</label>
-        <input id="kamera" type="text" placeholder="rtsp://kullanici:sifre@192.168.1.64:554/stream1">
+        <div class="satir"><input id="kamera" type="text" placeholder="rtsp://kullanici:sifre@192.168.1.64:554/stream1"><button id="kameraDeneBtn" style="flex-shrink:0">Dene</button></div>
+        <div id="kameraSonuc" class="kucuk"></div>
         <label>Akşam kontrol saati</label>
         <input id="raporSaati" type="time">
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="otomatik"> Program açılınca izleme kendiliğinden başlasın</label>
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="videoKaydet"> Geçiş videolarını saatlik kaydet</label>
-        <label>Telegram bot anahtarı</label>
-        <input id="tgToken" type="password" placeholder="değiştirmek için yazın">
-        <label>Telegram sohbet no</label>
-        <input id="tgChat" type="text" placeholder="değiştirmek için yazın">
+        <div class="arac"><button class="ana" id="kaydetBtn">Kaydet</button><span id="ayarSonuc" class="kucuk"></span></div>
+      </details>
+    </div>
+
+    <div class="kart">
+      <details id="tgDetay">
+        <summary>📨 Telegram bildirimi <span id="tgDurum" class="kucuk"></span></summary>
+        <ol class="kucuk" style="padding-left:18px;margin:8px 0">
+          <li>Telegram'da <b>@BotFather</b>'ı açın, <b>/newbot</b> yazın, bir ad verin.</li>
+          <li>Size verdiği uzun kodu (anahtar) aşağıya yapıştırın.</li>
+          <li>Yeni botunuzu Telegram'da açıp <b>merhaba</b> yazın, sonra <b>Bağla</b>'ya basın.</li>
+        </ol>
+        <label>Bot anahtarı</label>
+        <input id="tgToken" type="password" placeholder="123456789:AAH...">
         <div class="arac">
-          <button class="ana" id="kaydetBtn">Kaydet</button>
-          <button id="tgTestBtn">Telegram'ı dene</button>
+          <button class="ana" id="tgBaglaBtn">Bağla</button>
+          <button id="tgTestBtn">Deneme mesajı gönder</button>
         </div>
-        <div id="ayarSonuc" class="kucuk" style="margin-top:6px"></div>
+        <div id="tgSonuc" class="kucuk" style="margin-top:6px"></div>
+      </details>
+    </div>
+
+    <div class="kart">
+      <details>
+        <summary>🗒️ Sistem günlüğü</summary>
+        <div id="sistem" class="kucuk" style="margin-top:8px;font-family:ui-monospace,monospace;white-space:pre-wrap;line-height:1.5"></div>
+        <div class="kucuk" style="margin-top:8px">Geçiş kayıtları: <a href="/kayit-csv" target="_blank">gecisler.csv</a> (Excel'de açılır)</div>
       </details>
     </div>
   </aside>
@@ -232,14 +251,24 @@ async function demoBaslat(ad){
 
 $("#kaydetBtn").onclick = async () => {
   await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
-    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked,
-    telegram_token: $("#tgToken").value, telegram_chat: $("#tgChat").value});
-  $("#tgToken").value = $("#tgChat").value = "";
+    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked});
   $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
+};
+$("#kameraDeneBtn").onclick = async () => {
+  $("#kameraSonuc").textContent = "Bağlanılıyor…";
+  const r = await api("/api/kamera-dene", {kamera: $("#kamera").value});
+  $("#kameraSonuc").textContent = r.ok ? `✓ Görüntü alındı (${r.boyut}) — ekranda görünüyor` : r.hata;
+  if (r.ok) akisAc();
+};
+$("#tgBaglaBtn").onclick = async () => {
+  $("#tgSonuc").textContent = "Kontrol ediliyor…";
+  const r = await api("/api/telegram-bagla", {telegram_token: $("#tgToken").value});
+  $("#tgSonuc").textContent = r.ok ? `✓ Bağlandı: @${r.bot} → ${r.kim}. Telefonunuza mesaj geldi.` : r.hata;
+  if (r.ok) { $("#tgToken").value = ""; yenile(); }
 };
 $("#tgTestBtn").onclick = async () => {
   const r = await api("/api/telegram-test", {});
-  $("#ayarSonuc").textContent = r.ok ? "Telegram mesajı gönderildi ✓" : "Gönderilemedi — bot anahtarını ve sohbet numarasını kontrol edin.";
+  $("#tgSonuc").textContent = r.ok ? "Deneme mesajı gönderildi ✓" : "Gönderilemedi — önce Bağla adımını tamamlayın.";
 };
 
 function goster(metin, tur){ const m = $("#mesaj"); m.textContent = metin; m.className = "mesaj " + tur; }
@@ -282,13 +311,14 @@ async function yenile(){
     const a = D.ayarlar;
     $("#suru").value = a.suru; $("#tolerans").value = a.tolerans; $("#kamera").value = a.kamera;
     $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
-    $("#tgChat").placeholder = D.telegram ? "ayarlı — değiştirmek için yazın" : "ör. 123456789";
     $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
     document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));
     ayarYuklendi = true;
   }
 
+  $("#tgDurum").textContent = D.telegram ? "· bağlı ✓" : "· bağlı değil";
+  $("#sistem").textContent = D.sistem.length ? D.sistem.join("\n") : "Henüz kayıt yok.";
   $("#gecmis").innerHTML = D.gecmis.length ? D.gecmis.map(g =>
     `<tr><td>${g.tarih}</td><td class="sayi">${g.cikan}</td><td class="sayi">${g.giren}</td><td>${g.rapor || "–"}</td></tr>`).join("")
     : '<tr><td colspan="4" class="kucuk">Henüz kayıt yok.</td></tr>';

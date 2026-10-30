@@ -14,7 +14,7 @@ from pathlib import Path
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 import defter
-from bildir import gonder
+from bildir import bot_adi, gonder, sohbet_bul
 from motor import Motor
 
 KOK = Path(__file__).parent
@@ -32,6 +32,7 @@ def model_yolu():
 
 app = Flask(__name__, static_folder=str(KOK / "arayuz"))
 motor = Motor(model_yolu())
+motor.log = defter.sistem_log
 durum = {"kip": None, "demo": None, "son": (0, 0), "mesaj": ""}
 
 
@@ -132,6 +133,13 @@ def kayit_video(ad):
     return send_from_directory(VIDEO_KAYIT, ad)
 
 
+@app.get("/kayit-csv")
+def kayit_csv():
+    if not defter.CSV.exists():
+        return "Henüz geçiş kaydı yok.", 404
+    return send_from_directory(defter.KLASOR, defter.CSV.name, as_attachment=True)
+
+
 @app.get("/akis")
 def akis():
     def uret():
@@ -156,7 +164,7 @@ def api_durum():
                     "goruntu": motor.jpeg is not None, "ayarlar": a, "demolar": demolar(),
                     "bugun": {k: v for k, v in bugun.items() if k != "olaylar"},
                     "olaylar": bugun["olaylar"][-8:][::-1], "disarida": defter.disarida(bugun),
-                    "gecmis": defter.gecmis(), "videolar": videolar,
+                    "gecmis": defter.gecmis(), "videolar": videolar, "sistem": defter.son_sistem(12),
                     "model": Path(motor.model_yolu).name,
                     "telegram": bool(e.get("TELEGRAM_TOKEN") and e.get("TELEGRAM_CHAT_ID"))})
 
@@ -244,11 +252,55 @@ def api_ayarlar():
     return jsonify({"ok": True})
 
 
+@app.post("/api/telegram-bagla")
+def api_telegram_bagla():
+    """Bot anahtarı girildi, kullanıcı bota 'merhaba' yazdı → sohbet numarasını bul ve kaydet."""
+    d = request.json or {}
+    e = env_oku()
+    token = (d.get("telegram_token") or "").strip() or e.get("TELEGRAM_TOKEN", "")
+    if not token:
+        return jsonify({"hata": "Önce bot anahtarını yapıştırın."}), 400
+    ad = bot_adi(token)
+    if not ad:
+        return jsonify({"hata": "Bot anahtarı geçersiz (BotFather'dan aldığınız uzun kodu kontrol edin)."}), 400
+    bul = sohbet_bul(token)
+    if not bul:
+        return jsonify({"hata": f"Telegram'da @{ad} botunu açıp 'merhaba' yazın, sonra tekrar basın.", "bot": ad}), 400
+    sohbet, kim = bul
+    e["TELEGRAM_TOKEN"], e["TELEGRAM_CHAT_ID"] = token, sohbet
+    (KOK / ".env").write_text("".join(f"{k}={v}\n" for k, v in e.items()))
+    gonder("🐑 Koyun Sayacı bağlandı. Bildirimler buraya gelecek.")
+    defter.sistem_log(f"TELEGRAM bağlandı: @{ad} → {kim}")
+    return jsonify({"ok": True, "bot": ad, "kim": kim})
+
+
+@app.post("/api/kamera-dene")
+def api_kamera_dene():
+    """Kamera adresinden tek kare alır; bağlantı ve görüntü kontrolü."""
+    import cv2
+    d = request.json or {}
+    adres = (d.get("kamera") or ayarlar()["kamera"]).strip()
+    if not adres:
+        return jsonify({"hata": "Kamera adresi boş."}), 400
+    cap = cv2.VideoCapture(adres)
+    ok, img = cap.read()
+    cap.release()
+    if not ok:
+        defter.sistem_log(f"KAMERA deneme başarısız: {adres}")
+        return jsonify({"hata": "Kameraya bağlanılamadı. Adres, kullanıcı adı/şifre ve ağ bağlantısını kontrol edin."}), 400
+    _, buf = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 70])
+    motor.jpeg = buf.tobytes()
+    h, w = img.shape[:2]
+    defter.sistem_log(f"KAMERA deneme başarılı: {w}x{h}")
+    return jsonify({"ok": True, "boyut": f"{w}×{h}"})
+
+
 @app.post("/api/telegram-test")
 def api_telegram_test():
     return jsonify({"ok": gonder("🐑 Koyun Sayacı test mesajı — bildirimler çalışıyor.")})
 
 
 if __name__ == "__main__":
+    defter.sistem_log(f"PROGRAM açıldı, model {Path(model_yolu()).name}")
     threading.Thread(target=bekci, daemon=True).start()
     app.run(host="127.0.0.1", port=8780, threaded=True)
