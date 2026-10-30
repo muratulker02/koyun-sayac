@@ -1,0 +1,14 @@
+## --guven 0.25 --boyut 960
+TOPLAM: gerçek 160  sayılan 99  hata -61  doğruluk %61.9
+## --guven 0.10 --boyut 960
+TOPLAM: gerçek 160  sayılan 103  hata -57  doğruluk %64.4
+## --guven 0.10 --boyut 1280
+TOPLAM: gerçek 160  sayılan 97  hata -63  doğruluk %60.6
+## --guven 0.10 --boyut 1280 --takip botsort.yaml
+TOPLAM: gerçek 160  sayılan 101  hata -59  doğruluk %63.1
+## --guven 0.10 --boyut 1280 --iou 0.5
+TOPLAM: gerçek 160  sayılan 99  hata -61  doğruluk %61.9
+## --guven 0.15 --boyut 1280 --iou 0.5 --takip takip/koyun-bytetrack.yaml
+TOPLAM: gerçek 160  sayılan 91  hata -69  doğruluk %56.9
+## --guven 0.10 --boyut 1536 --iou 0.5 --takip takip/koyun-bytetrack.yaml
+TOPLAM: gerçek 160  sayılan 99  hata -61  doğruluk %61.9

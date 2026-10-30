@@ -30,10 +30,10 @@ def gercek_sayi(gt, w, h):
     return s.giren, s.cikan
 
 
-def program_sayisi(model, video, siniflar, guven, boyut):
+def program_sayisi(model, video, siniflar, guven, boyut, takip="bytetrack.yaml", iou=0.7):
     s = None
-    for r in model.track(source=str(video), stream=True, persist=False, tracker="bytetrack.yaml",
-                         classes=siniflar, conf=guven, imgsz=boyut, verbose=False):
+    for r in model.track(source=str(video), stream=True, persist=False, tracker=takip,
+                         classes=siniflar, conf=guven, imgsz=boyut, iou=iou, verbose=False):
         h, w = r.orig_shape
         if s is None:
             s = CizgiSayaci((0, CIZGI_Y * h), (w, CIZGI_Y * h))
@@ -49,6 +49,8 @@ def main():
     p.add_argument("--guven", type=float, default=0.25)
     p.add_argument("--boyut", type=int, default=960)
     p.add_argument("--videolar", default=",".join(VIDEOLAR))
+    p.add_argument("--takip", default="bytetrack.yaml")
+    p.add_argument("--iou", type=float, default=0.7)
     a = p.parse_args()
     model = YOLO(a.model)
     siniflar = [18] if len(model.names) > 1 else [0]
@@ -57,7 +59,7 @@ def main():
         video = V / f"Videos/crop_23.11.23-{n}.MP4"
         g_giren, _ = gercek_sayi(V / f"MOT1.1/MOT1.1_crop_23.11.23-{n}/gt/gt.txt", 1440, 1080)
         model = YOLO(a.model)  # her video temiz takipçi
-        p_giren, p_cikan = program_sayisi(model, video, siniflar, a.guven, a.boyut)
+        p_giren, p_cikan = program_sayisi(model, video, siniflar, a.guven, a.boyut, a.takip, a.iou)
         satirlar.append({"video": n, "gercek": g_giren, "sayilan": p_giren, "ters": p_cikan})
         top_g += g_giren
         top_p += p_giren
