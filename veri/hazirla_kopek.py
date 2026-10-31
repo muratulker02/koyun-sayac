@@ -8,6 +8,7 @@ Köpek tespitlerinin küçük kırpımları `kontrol/` altına yazılır → yan
 
   python veri/hazirla_kopek.py <video klasörü> <çıktı klasörü> [kare/sn=1]
 """
+import json
 import random
 import sys
 from pathlib import Path
@@ -51,11 +52,17 @@ for v in videolar:
         k = koyun_m.predict(img, imgsz=1280, conf=0.3, verbose=False)[0]
         g = genel_m.predict(img, imgsz=1280, conf=0.3, verbose=False)[0]
         satirlar = []
-        for (x1, y1, x2, y2) in k.boxes.xyxy.tolist():
+        koyun_kutular = list(zip(k.boxes.xyxy.tolist(), k.boxes.conf.tolist()))
+        for (x1, y1, x2, y2), _ in koyun_kutular:
             satirlar.append(f"0 {(x1+x2)/2/w:.6f} {(y1+y2)/2/h:.6f} {(x2-x1)/w:.6f} {(y2-y1)/h:.6f}")
+        kirpimlar = {}   # kırpım dosyası → bu karedeki etiket satırı (ayıklama için)
         kopek = insan = 0
         for (x1, y1, x2, y2), c, conf in zip(g.boxes.xyxy.tolist(), g.boxes.cls.int().tolist(), g.boxes.conf.tolist()):
             if c == KOPEK and conf < KOPEK_ESIK:
+                continue
+            # koyun modelinin ≥0,75 güvenle koyun dediği yer köpek sayılmaz (YOLO-World bazen koyunu köpek sanıyor)
+            if c == KOPEK and any(kc >= 0.75 and _ortusuyor(f"0 {(a+b)/2/w} {(cc+d)/2/h} {(b-a)/w} {(d-cc)/h}", x1, y1, x2, y2, w, h)
+                                  for (a, cc, b, d), kc in koyun_kutular):
                 continue
             sinif = 1 if c == KOPEK else 2
             kopek += sinif == 1; insan += sinif == 2
@@ -66,7 +73,12 @@ for v in videolar:
                 cx, cy, boy = (x1+x2)/2, (y1+y2)/2, max(x2-x1, y2-y1)
                 kes = img[max(0, int(cy-3*boy)):int(cy+3*boy), max(0, int(cx-3*boy)):int(cx+3*boy)]
                 if kes.size:
-                    cv2.imwrite(str(OUT / "kontrol" / f"{v.stem}_k{i}_{conf:.2f}.jpg"), cv2.resize(kes, (320, int(320*kes.shape[0]/max(1, kes.shape[1])))))
+                    kes = kes.copy()
+                    ox, oy = max(0, int(cx-3*boy)), max(0, int(cy-3*boy))
+                    cv2.rectangle(kes, (int(x1-ox), int(y1-oy)), (int(x2-ox), int(y2-oy)), (0, 0, 255), 3)
+                    kad = f"{v.stem}_k{i}_{conf:.2f}.jpg"
+                    cv2.imwrite(str(OUT / "kontrol" / kad), cv2.resize(kes, (320, int(320*kes.shape[0]/max(1, kes.shape[1])))))
+                    kirpimlar[kad] = satirlar[-1]
         if not satirlar:
             continue
         al = kopek or insan or random.random() < 0.15   # koyun-yalnız karelerin %15'i
@@ -76,6 +88,9 @@ for v in videolar:
         ad = f"{v.stem}_k{i}"
         cv2.imwrite(str(OUT / "images" / bol / f"{ad}.jpg"), img, [cv2.IMWRITE_JPEG_QUALITY, 90])
         (OUT / "labels" / bol / f"{ad}.txt").write_text("\n".join(satirlar) + "\n")
+        for kad, satir in kirpimlar.items():
+            with open(OUT / "kontrol" / "esleme.jsonl", "a") as f:
+                f.write(json.dumps({"kirpim": kad, "etiket": f"labels/{bol}/{ad}.txt", "satir": satir}) + "\n")
         sayac["kare"] += 1; sayac["kopekli"] += bool(kopek); sayac["insanli"] += bool(insan)
         sayac["koyun_yalniz"] += not (kopek or insan); sayac["kopek_kutu"] += kopek; sayac["insan_kutu"] += insan
     cap.release()
