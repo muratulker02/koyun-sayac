@@ -41,5 +41,11 @@ Dört farklı model de bu videolarda 47–49 saydı; gerçek sayı büyük ihtim
 Takipçi ayarları (güven eşiği, görüntü boyutu, ByteTrack/BoT-SORT) eğitilmiş modelde fark yaratmadı
 (7 ayarın 5'i 160/160) → programdaki varsayılanlar kaldı.
 
+## Kurulum testleri (31 Ekim)
+| Ortam | Sonuç |
+|---|---|
+| Mac (M5 Max) | geliştirme + tüm ölçümler; canlı RTSP kamera simülasyonu: kesilme/yeniden bağlanma, saatlik kayıt, günlük ✅ |
+| Windows 11 + RTX 5060 Ti | `kur.bat` sıfırdan kuruldu (torch cu128, CUDA aktif), demo #3: **38/38**, 56 kare/sn, 0 şüpheli ✅ |
+
 ## Sırada
 Çiftlikte kamera takılınca ilk haftanın görüntüleriyle son ince ayar; hedef, senin ağılında da %100.
