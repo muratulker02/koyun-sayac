@@ -1,0 +1,45 @@
+# Koyun Sayacı — Eğitim ve Test Sonuçları (31 Ekim 2026)
+
+## Son model: `modeller/koyun-tepeden.pt` (YOLO26s, büyük eğitim)
+
+Eğitim verisi: 1.305 tepeden görüntü, 18.376+ işaretli koyun (ICAERUS drone seti + kapı videoları, Fransa).
+Eğitim: 40 tur, M5 Max Mac. Video #3 eğitime hiç girmedi (dürüst sınav).
+
+### Hiç görmediği 428 tepeden fotoğrafta tespit
+| Hassasiyet | Yakalama | mAP50 | mAP50-95 |
+|---|---|---|---|
+| 0,992 | 0,989 | 0,995 | 0,904 |
+(ICAERUS'un kendi "altın standart" modeli: 0,97 / 0,966 / 0,991)
+
+### Sayım sınavı — gerçek geçiş sayısı bilinen 4 video
+| Video | Gerçek | Sayılan |
+|---|---|---|
+| #1 | 35 | 35 |
+| #2 | 41 | 41 |
+| **#3 (eğitimde yok)** | **38** | **38** |
+| #4 | 46 | 46 |
+| Toplam | 160 | **160 → %100** |
+
+### Kapının tam üstü videoları (sayısı "≈50" diye verilmiş, kesin değil)
+| Yükseklik | Sayılan | Verilen numara | Şüpheli |
+|---|---|---|---|
+| 5 m | 47 | 47 | 0 |
+| 6 m | 47 | 57 | 0 |
+| 10 m | 47 | 50 | 0 |
+Dört farklı model de bu videolarda 47–49 saydı; gerçek sayı büyük ihtimalle 47.
+
+## Yol
+| Model | 4 video | Not |
+|---|---|---|
+| Hazır YOLO11s (eğitimsiz) | 77/160 (%48) | tepeden koyunu tanımıyor |
+| Hazır YOLO26s (eğitimsiz) | 99/160 (%62) | |
+| YOLO11s, 540 kare ince ayar | 160/160 | |
+| YOLO26s, 540 kare ince ayar | 160/160 | |
+| YOLO11s, büyük (1.305) | 159/160 | 428 fotoğrafta R 0,981 |
+| **YOLO26s, büyük (1.305)** | **160/160** | **428 fotoğrafta R 0,989 — SEÇİLDİ** |
+
+Takipçi ayarları (güven eşiği, görüntü boyutu, ByteTrack/BoT-SORT) eğitilmiş modelde fark yaratmadı
+(7 ayarın 5'i 160/160) → programdaki varsayılanlar kaldı.
+
+## Sırada
+Çiftlikte kamera takılınca ilk haftanın görüntüleriyle son ince ayar; hedef, senin ağılında da %100.

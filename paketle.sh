@@ -4,7 +4,7 @@ set -e
 cd "$(dirname "$0")"
 AD="KoyunSayaci-$(date +%Y%m%d)"
 P="/tmp/$AD"; rm -rf "$P"; mkdir -p "$P/modeller" "$P/test-video" "$P/takip" "$P/arayuz" "$P/kayitlar"
-cp app.py motor.py cizgi.py defter.py bildir.py say.py KURULUM.md kur.bat baslat.vbs kur.command "$P/"
+cp app.py motor.py cizgi.py defter.py bildir.py say.py KURULUM.md SONUCLAR.md kur.bat baslat.vbs kur.command "$P/"
 cp arayuz/index.html "$P/arayuz/"; cp takip/*.yaml "$P/takip/"
 cp modeller/koyun-tepeden.pt "$P/modeller/"
 # küçük demolar (gerçek sayısı bilinen 2 video + kapı üstü 1)
