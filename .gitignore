@@ -19,3 +19,6 @@ __pycache__/
 .DS_Store
 yuklenen/
 .gizli
+weights/
+*.pt
+*.pth
