@@ -13,7 +13,7 @@ echo.
 
 where uv >nul 2>nul
 if errorlevel 1 (
-  echo  [1/4] Paket yoneticisi (uv) indiriliyor...
+  echo  [1/4] Paket yoneticisi uv indiriliyor...
   powershell -ExecutionPolicy ByPass -NoProfile -Command "irm https://astral.sh/uv/install.ps1 | iex"
   set "PATH=%USERPROFILE%\.local\bin;%PATH%"
 ) else (
@@ -21,6 +21,10 @@ if errorlevel 1 (
 )
 
 echo  [2/4] Python 3.12 ortami kuruluyor...
+rem Python bu klasorun icine iner: bilgisayardaki baska Python kurulumlarindan etkilenmez
+set "UV_PYTHON_INSTALL_DIR=%~dp0.python"
+uv python install 3.12 -q
+if errorlevel 1 goto hata
 uv venv --python 3.12 .venv -q
 if errorlevel 1 goto hata
 
@@ -31,7 +35,7 @@ if errorlevel 1 (
   uv pip install --python .venv\Scripts\python.exe -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ) else (
   echo        NVIDIA ekran karti bulundu: CUDA surumu kurulacak.
-  rem cu128: RTX 50 serisi (Blackwell) dahil; eski kartlarda da calisir
+  rem cu128: RTX 50 serisi dahil, eski kartlarda da calisir
   uv pip install --python .venv\Scripts\python.exe -q torch torchvision --index-url https://download.pytorch.org/whl/cu128
 )
 if errorlevel 1 goto hata
