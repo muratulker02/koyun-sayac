@@ -68,6 +68,9 @@
   .kayit{display:inline-block;margin:3px 6px 3px 0;font-size:13px;color:var(--mavi)}
   .nokta{display:inline-block;width:9px;height:9px;border-radius:50%;background:#bbb;margin-right:6px}
   .nokta.on{background:var(--yesil);box-shadow:0 0 0 3px var(--yesil-a)}
+  .birak{display:block;border:2px dashed #cfc7b4;border-radius:12px;padding:18px 12px;text-align:center;color:var(--soluk);cursor:pointer;background:#fbf9f4;margin:0}
+  .birak:hover,.birak.ustunde{border-color:var(--yesil);color:var(--yesil);background:var(--yesil-a)}
+  .birak.calisiyor{border-style:solid;color:var(--sari);border-color:var(--sari)}
 </style>
 </head>
 <body>
@@ -116,6 +119,19 @@
   </section>
 
   <aside class="yan">
+    <div class="kart">
+      <h2>📷 Fotoğraf / video ile say</h2>
+      <div class="kucuk" style="margin-bottom:8px">Telefondan ya da drone'dan çekilmiş bir fotoğraf/video seçin; kaç koyun var sayılır, her koyun numaralanır.</div>
+      <label class="birak" id="birak">
+        <input type="file" id="dosya" accept="image/*,video/*" style="display:none">
+        <span id="birakYazi">📂 Dosya seç ya da buraya bırakın</span>
+      </label>
+      <div id="yukleSonuc" style="display:none;margin-top:10px">
+        <div class="satir"><b id="yukleSayi" style="font-size:32px;color:var(--yesil)"></b><span id="yukleAlt" class="kucuk"></span></div>
+        <a id="yukleLink" target="_blank"><img id="yukleImg" style="width:100%;border-radius:10px;margin-top:8px;display:block" alt="sayım sonucu"></a>
+      </div>
+    </div>
+
     <div class="kart">
       <h2><span id="izNokta" class="nokta"></span>Kamera izleme</h2>
       <div class="kucuk" id="kameraDurum">Kamera ayarlanmadı.</div>
@@ -272,6 +288,28 @@ $("#tgTestBtn").onclick = async () => {
 };
 
 function goster(metin, tur){ const m = $("#mesaj"); m.textContent = metin; m.className = "mesaj " + tur; }
+
+// Fotoğraf / video yükleyip sayma
+const birak = $("#birak");
+async function dosyaSay(f){
+  if (!f) return;
+  birak.classList.add("calisiyor"); $("#birakYazi").textContent = `⏳ ${f.name} sayılıyor… (video ise biraz sürer)`;
+  const fd = new FormData(); fd.append("dosya", f);
+  let r;
+  try { r = await (await fetch("/api/yukle", {method: "POST", body: fd})).json(); }
+  catch (e) { r = {hata: "Yükleme başarısız: " + e}; }
+  birak.classList.remove("calisiyor");
+  if (!r.ok) { $("#birakYazi").textContent = "❌ " + r.hata; return; }
+  $("#birakYazi").textContent = "📂 Başka dosya seç";
+  $("#yukleSonuc").style.display = "block";
+  $("#yukleSayi").textContent = r.sayi + " koyun";
+  $("#yukleAlt").textContent = r.tur === "video" ? `tek karede en çok ${r.en_cok_karede} · takiple ${r.takiple} · ${r.kare} kare` : "fotoğrafta sayıldı";
+  $("#yukleImg").src = r.goruntu + "?" + Date.now(); $("#yukleLink").href = r.goruntu;
+}
+$("#dosya").onchange = e => dosyaSay(e.target.files[0]);
+birak.ondragover = e => { e.preventDefault(); birak.classList.add("ustunde"); };
+birak.ondragleave = () => birak.classList.remove("ustunde");
+birak.ondrop = e => { e.preventDefault(); birak.classList.remove("ustunde"); dosyaSay(e.dataTransfer.files[0]); };
 
 const DURUM = {bekliyor: "bekliyor", calisiyor: "sayıyor", baglaniyor: "kameraya bağlanıyor…", bitti: "bitti", hata: "hata"};
 let sonMesaj = "";

@@ -14,3 +14,7 @@ egitimler/
 aday/
 ayarlar.json
 veri/icaerus-repo/
+__pycache__/
+*.pyc
+.DS_Store
+yuklenen/

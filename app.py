@@ -16,12 +16,14 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 import defter
 from bildir import bot_adi, gonder, sohbet_bul
+from fotosay import say as foto_say
 from motor import Motor
 
 KOK = Path(__file__).parent
 AYAR = KOK / "ayarlar.json"
 DEMO = KOK / "test-video"
 VIDEO_KAYIT = KOK / "kayitlar" / "video"
+YUKLENEN = KOK / "yuklenen"          # telefondan/drone'dan gelen fotoğraf-videolar (eğitim için de saklanır)
 VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False,
               "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True}
 
@@ -32,6 +34,7 @@ def model_yolu():
 
 
 app = Flask(__name__, static_folder=str(KOK / "arayuz"))
+app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 ** 3
 motor = Motor(model_yolu())
 motor.log = defter.sistem_log
 durum = {"kip": None, "demo": None, "son": (0, 0), "mesaj": ""}
@@ -294,6 +297,33 @@ def api_kamera_dene():
     h, w = img.shape[:2]
     defter.sistem_log(f"KAMERA deneme başarılı: {w}x{h}")
     return jsonify({"ok": True, "boyut": f"{w}×{h}"})
+
+
+@app.post("/api/yukle")
+def api_yukle():
+    """Telefon fotoğrafı / drone videosu yükle → kaç koyun var? Dosya eğitim için yuklenen/ altında kalır."""
+    f = request.files.get("dosya")
+    if not f or not f.filename:
+        return jsonify({"hata": "Dosya seçilmedi."}), 400
+    uzanti = Path(f.filename).suffix.lower()
+    if uzanti not in (".jpg", ".jpeg", ".png", ".webp", ".bmp", ".mp4", ".mov", ".avi", ".mkv", ".m4v"):
+        return jsonify({"hata": f"Desteklenmeyen dosya türü: {uzanti}"}), 400
+    YUKLENEN.mkdir(exist_ok=True)
+    ad = datetime.now().strftime("%Y%m%d-%H%M%S") + uzanti
+    yol = YUKLENEN / ad
+    f.save(yol)
+    try:
+        sonuc = foto_say(model_yolu(), yol, YUKLENEN / (yol.stem + "-sonuc.jpg"))
+    except Exception as e:
+        return jsonify({"hata": f"Sayılamadı: {e}"}), 400
+    defter.sistem_log(f"YÜKLEME sayıldı: {ad} → {sonuc['sayi']} koyun")
+    sonuc.update(ad=ad, goruntu=f"/yuklenen/{yol.stem}-sonuc.jpg")
+    return jsonify({"ok": True, **sonuc})
+
+
+@app.get("/yuklenen/<ad>")
+def yuklenen_dosya(ad):
+    return send_from_directory(YUKLENEN, ad)
 
 
 @app.post("/api/telegram-test")
