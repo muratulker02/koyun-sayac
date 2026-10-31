@@ -12,7 +12,8 @@ import time
 from datetime import date, datetime
 from pathlib import Path
 
-from flask import Flask, Response, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, redirect, request, send_from_directory, session
+from werkzeug.security import check_password_hash, generate_password_hash
 
 import defter
 from bildir import bot_adi, gonder, sohbet_bul
@@ -25,7 +26,8 @@ DEMO = KOK / "test-video"
 VIDEO_KAYIT = KOK / "kayitlar" / "video"
 YUKLENEN = KOK / "yuklenen"          # telefondan/drone'dan gelen fotoğraf-videolar (eğitim için de saklanır)
 VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False,
-              "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True}
+              "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True,
+              "giris_kullanici": "", "giris_sifre_hash": ""}
 
 
 def model_yolu():
@@ -35,6 +37,57 @@ def model_yolu():
 
 app = Flask(__name__, static_folder=str(KOK / "arayuz"))
 app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 ** 3
+app.secret_key = (KOK / ".gizli").read_text() if (KOK / ".gizli").exists() else None
+if not app.secret_key:
+    app.secret_key = os.urandom(32).hex()
+    (KOK / ".gizli").write_text(app.secret_key)
+
+
+# --- isteğe bağlı giriş: Ayarlar'da kullanıcı adı + şifre verilirse herkes giriş yapmadan göremez ---
+GIRIS_HTML = """<!doctype html><html lang=tr><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Koyun Sayacı — Giriş</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f1ea;font:15px system-ui}
+form{background:#fffdf8;border:1px solid #e3ddd0;border-radius:14px;padding:26px 28px;width:300px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+h1{font-size:20px;margin:0 0 14px}label{display:block;font-size:13px;color:#6b7365;margin:10px 0 4px}
+input{width:100%;box-sizing:border-box;font:inherit;padding:9px 10px;border:1px solid #e3ddd0;border-radius:8px}
+button{width:100%;margin-top:16px;padding:11px;font:inherit;font-weight:600;background:#2f7d3b;color:#fff;border:0;border-radius:10px;cursor:pointer}
+.hata{color:#c0392b;font-size:13px;margin-top:8px}</style>
+<form method=post><h1>🐑 Koyun Sayacı</h1><label>Kullanıcı adı</label><input name=k autofocus autocomplete=username>
+<label>Şifre</label><input name=s type=password autocomplete=current-password><button>Giriş</button>{HATA}</form>"""
+
+
+def giris_gerekli():
+    a = ayarlar()
+    return bool(a.get("giris_kullanici") and a.get("giris_sifre_hash"))
+
+
+@app.before_request
+def giris_kontrol():
+    if request.path.startswith("/giris") or not giris_gerekli() or session.get("giris"):
+        return None
+    if request.path.startswith("/api/"):
+        return jsonify({"hata": "giriş gerekli"}), 401
+    return redirect("/giris")
+
+
+@app.route("/giris", methods=["GET", "POST"])
+def giris():
+    if not giris_gerekli():
+        return redirect("/")
+    hata = ""
+    if request.method == "POST":
+        a = ayarlar()
+        if request.form.get("k") == a["giris_kullanici"] and check_password_hash(a["giris_sifre_hash"], request.form.get("s", "")):
+            session["giris"] = True
+            defter.sistem_log(f"GİRİŞ yapıldı: {a['giris_kullanici']} ({request.remote_addr})")
+            return redirect("/")
+        hata = '<div class=hata>Kullanıcı adı ya da şifre yanlış.</div>'
+    return GIRIS_HTML.replace("{HATA}", hata)
+
+
+@app.get("/cikis")
+def cikis():
+    session.clear()
+    return redirect("/giris")
 motor = Motor(model_yolu())
 motor.log = defter.sistem_log
 durum = {"kip": None, "demo": None, "son": (0, 0), "mesaj": ""}
@@ -165,7 +218,7 @@ def api_durum():
     videolar = sorted((p.name for p in VIDEO_KAYIT.glob(f"{date.today().isoformat()}_*.mp4")), reverse=True) \
         if VIDEO_KAYIT.exists() else []
     return jsonify({**motor.ozet(), "kip": durum["kip"], "demo": durum["demo"], "mesaj": durum["mesaj"],
-                    "goruntu": motor.jpeg is not None, "ayarlar": a, "demolar": demolar(),
+                    "goruntu": motor.jpeg is not None, "ayarlar": {k: v for k, v in a.items() if k != "giris_sifre_hash"}, "giris_acik": giris_gerekli(), "demolar": demolar(),
                     "bugun": {k: v for k, v in bugun.items() if k != "olaylar"},
                     "olaylar": bugun["olaylar"][-8:][::-1], "disarida": defter.disarida(bugun),
                     "gecmis": defter.gecmis(), "videolar": videolar, "sistem": defter.son_sistem(12),
@@ -245,6 +298,12 @@ def api_ayarlar():
     for k in ("otomatik_baslat", "video_kaydet"):
         if k in d:
             a[k] = bool(d[k])
+    if "giris_kullanici" in d:
+        a["giris_kullanici"] = str(d["giris_kullanici"]).strip()
+        if not a["giris_kullanici"]:
+            a["giris_sifre_hash"] = ""          # kullanıcı adı silindi → giriş kapalı
+    if d.get("giris_sifre"):
+        a["giris_sifre_hash"] = generate_password_hash(str(d["giris_sifre"]))
     ayar_kaydet(a)
     if d.get("telegram_token") or d.get("telegram_chat"):
         e = env_oku()

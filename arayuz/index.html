@@ -79,6 +79,7 @@
   <span id="rozet" class="rozet">bekliyor</span>
   <span id="bilgi" class="kucuk"></span>
   <span id="modelBilgi" class="kucuk" style="margin-left:auto"></span>
+  <a id="cikisLink" href="/cikis" class="kucuk" style="display:none;margin-left:12px">Çıkış</a>
 </header>
 
 <main>
@@ -162,6 +163,10 @@
         <input id="raporSaati" type="time">
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="otomatik"> Program açılınca izleme kendiliğinden başlasın</label>
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="videoKaydet"> Geçiş videolarını saatlik kaydet</label>
+        <label>Giriş kullanıcı adı <span class="kucuk">(boş = şifresiz, yalnız bu bilgisayar)</span></label>
+        <input id="girisK" type="text" autocomplete="off" placeholder="örn. ahmet">
+        <label>Giriş şifresi <span class="kucuk">(değiştirmek için yazın)</span></label>
+        <input id="girisS" type="password" autocomplete="new-password" placeholder="••••••••">
         <div class="arac"><button class="ana" id="kaydetBtn">Kaydet</button><span id="ayarSonuc" class="kucuk"></span></div>
       </details>
     </div>
@@ -267,8 +272,9 @@ async function demoBaslat(ad){
 
 $("#kaydetBtn").onclick = async () => {
   await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
-    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked});
-  $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
+    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked,
+    giris_kullanici: $("#girisK").value, giris_sifre: $("#girisS").value});
+  $("#girisS").value = ""; $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
 };
 $("#kameraDeneBtn").onclick = async () => {
   $("#kameraSonuc").textContent = "Bağlanılıyor…";
@@ -330,6 +336,7 @@ async function yenile(){
     ? `${D.kip === "demo" ? `demo: ${D.cikan} çıktı, ${D.giren} girdi · ` : ""}ekranda ${D.kutu} koyun · ${D.izlenen} numara verildi${D.supheli ? ` · ⚠️ ${D.supheli} şüpheli` : ""} · ${D.fps} kare/sn`
     : (D.hata ? "Hata: " + D.hata : "");
   $("#modelBilgi").textContent = "model: " + D.model;
+  $("#cikisLink").style.display = D.giris_acik ? "inline" : "none";
   $("#durBtn").disabled = !["calisiyor", "baglaniyor"].includes(D.durum);
   $("#izleBtn").disabled = izleme && D.durum !== "hata";
   $("#izNokta").className = "nokta " + (izleme && D.durum === "calisiyor" ? "on" : "");
@@ -349,6 +356,7 @@ async function yenile(){
     const a = D.ayarlar;
     $("#suru").value = a.suru; $("#tolerans").value = a.tolerans; $("#kamera").value = a.kamera;
     $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
+    $("#girisK").value = a.giris_kullanici || "";
     $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
     document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));
