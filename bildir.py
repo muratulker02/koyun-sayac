@@ -5,6 +5,11 @@ from pathlib import Path
 import requests
 
 
+def _api():
+    # testte sahte sunucuya yönlendirmek için; normalde gerçek Telegram
+    return os.environ.get("TELEGRAM_API", "https://api.telegram.org")
+
+
 def _env():
     f = Path(__file__).parent / ".env"
     if f.exists():
@@ -20,7 +25,7 @@ def gonder(mesaj):
     if not (token and sohbet):
         print(f"[telegram kapalı] {mesaj}")
         return False
-    r = requests.post(f"https://api.telegram.org/bot{token}/sendMessage",
+    r = requests.post(f"{_api()}/bot{token}/sendMessage",
                       data={"chat_id": sohbet, "text": mesaj}, timeout=20)
     return r.ok
 
@@ -28,7 +33,7 @@ def gonder(mesaj):
 def sohbet_bul(token):
     """Kullanıcı bota bir mesaj attıysa sohbet numarasını döndürür (yoksa None)."""
     try:
-        r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates", timeout=20).json()
+        r = requests.get(f"{_api()}/bot{token}/getUpdates", timeout=20).json()
     except Exception:
         return None
     for u in reversed(r.get("result", [])):
@@ -40,7 +45,7 @@ def sohbet_bul(token):
 
 def bot_adi(token):
     try:
-        r = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=15).json()
+        r = requests.get(f"{_api()}/bot{token}/getMe", timeout=15).json()
         return r["result"]["username"] if r.get("ok") else None
     except Exception:
         return None

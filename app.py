@@ -6,6 +6,7 @@
   • Demo    — hazır videolarla deneme; deftere yazmaz, gerçek sayı biliniyorsa doğruluğu gösterir.
 """
 import json
+import os
 import threading
 import time
 from datetime import date, datetime
@@ -303,4 +304,4 @@ def api_telegram_test():
 if __name__ == "__main__":
     defter.sistem_log(f"PROGRAM açıldı, model {Path(model_yolu()).name}")
     threading.Thread(target=bekci, daemon=True).start()
-    app.run(host="127.0.0.1", port=8780, threaded=True)
+    app.run(host="127.0.0.1", port=int(os.environ.get("KOYUN_PORT", 8780)), threaded=True)
