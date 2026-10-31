@@ -31,7 +31,8 @@ if errorlevel 1 (
   uv pip install --python .venv\Scripts\python.exe -q torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ) else (
   echo        NVIDIA ekran karti bulundu: CUDA surumu kurulacak.
-  uv pip install --python .venv\Scripts\python.exe -q torch torchvision --index-url https://download.pytorch.org/whl/cu124
+  rem cu128: RTX 50 serisi (Blackwell) dahil; eski kartlarda da calisir
+  uv pip install --python .venv\Scripts\python.exe -q torch torchvision --index-url https://download.pytorch.org/whl/cu128
 )
 if errorlevel 1 goto hata
 uv pip install --python .venv\Scripts\python.exe -q ultralytics lap pyyaml requests flask

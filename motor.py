@@ -112,7 +112,11 @@ class Motor:
         for r in akis:
             if self.dur_bayragi:
                 return
-            self.durum = "calisiyor"
+            if self.durum != "calisiyor":
+                self.durum = "calisiyor"
+                if self._canli_mi():
+                    self.log("KAMERA bağlandı, sayım sürüyor")
+                    self.hata = ""
             h, w = r.orig_shape
             if self.sayac is None:
                 self.kare_boyut = (w, h)
