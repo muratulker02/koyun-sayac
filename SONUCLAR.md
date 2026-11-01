@@ -54,12 +54,25 @@ köpek P 0,923, insan mAP50 0,922. Pakete giren sürüm bu (r2).
 |---|---|---|
 | 4 bilinen video (160 koyun) | **160/160** | 159/160 (video 13: 45/46) |
 | Kapı üstü 5 m / 10 m (47) | 47 / 47 | 47 / 47 |
-| Kahverengi keçi videosu | 76 geçiş, 20 şüpheli, çoğu kaçtı | **84 geçiş, 0 şüpheli**, keçiler tespit ediliyor |
+| Kahverengi keçi videosu (elle sayım ~83 ±3) | 76 geçiş, 20 şüpheli, çoğu kaçtı | **84 geçiş, 0 şüpheli** → %99 |
 | Beyaz çoban köpeği | **koyun sanıyor** (%62) | koyun saymıyor; çoban "insan" |
 
 Karar: programda **varsayılan = beyaz sürü modeli** (Murat'ın sürüsü açık renk); Ayarlar → Model'den
-"karışık sürü" seçilebilir. Demo listesinde keçi (≈92) ve köpekli videolar **kendi modelini** (karışık sürü) kullanır;
+"karışık sürü" seçilebilir. Demo listesinde keçi (≈83; "≈92" eski modelin kör sayımıydı, 1 Kas yarık taramayla elle 83 sayıldı) ve köpekli videolar **kendi modelini** (karışık sürü) kullanır;
 beyaz sürü modeliyle keçi videosu 76 geçiş / 20 şüpheli, kutular yanıp sönüyordu (1 Kas, Murat'ın gözlemi). Sırada: 51 GB ek ICAERUS verisi (indirildi) ile üçüncü tur, hedef tek modelde ikisi de.
+
+### Keçi videosunun gerçek sayısı (1 Kas) — veri setinde sayı yok, elle doğrulandı
+Yarık tarama (sayım çizgisindeki piksel satırı her kareden alınıp üst üste dizildi; çizgiyi geçen her hayvan tek leke) ile
+baş sayımı: **83 küçükbaş (±3)**, 2 insan. "≈92" eski beyaz modelin kör sayımıydı (şüpheli kayıtlarla şişmiş).
+
+| Ayar (karışık sürü modeli, 4K kaynak) | Sayılan |
+|---|---|
+| 960 px, çizgi %50 (programın ayarı) | 84 |
+| 1280 px, çizgi %40 | 84 |
+| 1280 px, çizgi %60 | 84 |
+| 1920 px, çizgi %50 | 156 ✗ (model 960'ta eğitildi, bu boyut geçersiz; programda kullanılmaz) |
+
+Sonuç: elle 83, model 84 → %99; çizgi yeri sonucu değiştirmiyor.
 
 ## Kurulum testleri (31 Ekim)
 | Ortam | Sonuç |
