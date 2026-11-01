@@ -59,7 +59,7 @@ köpek P 0,923, insan mAP50 0,922. Pakete giren sürüm bu (r2).
 
 Karar: programda **varsayılan = beyaz sürü modeli** (Murat'ın sürüsü açık renk); Ayarlar → Model'den
 "karışık sürü" seçilebilir. Demo listesinde keçi (≈83; "≈92" eski modelin kör sayımıydı, 1 Kas yarık taramayla elle 83 sayıldı) ve köpekli videolar **kendi modelini** (karışık sürü) kullanır;
-beyaz sürü modeliyle keçi videosu 76 geçiş / 20 şüpheli, kutular yanıp sönüyordu (1 Kas, Murat'ın gözlemi). Sırada: 51 GB ek ICAERUS verisi (indirildi) ile üçüncü tur, hedef tek modelde ikisi de.
+beyaz sürü modeliyle keçi videosu 76 geçiş / 20 şüpheli, kutular yanıp sönüyordu (1 Kas, Murat'ın gözlemi). Sırada (isteğe bağlı): ek ICAERUS verisiyle üçüncü tur — indirme yarım kaldı (20,5 GB setin ~0,5 GB'ı indi, ikinci set hiç inmedi); etiketsiz veri sözde etiket ister, ~yarım gün.
 
 ### Keçi videosunun gerçek sayısı (1 Kas) — veri setinde sayı yok, elle doğrulandı
 Yarık tarama (sayım çizgisindeki piksel satırı her kareden alınıp üst üste dizildi; çizgiyi geçen her hayvan tek leke) ile
