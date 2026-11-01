@@ -47,15 +47,18 @@ Eğitim: beyaz koyun 1.305 + **etiketli keçi 287** (ICAERUS 14929694) + köpek/
 (koyun/küçükbaş · köpek · insan), 40 tur, koyun-tepeden.pt'den ince ayar. Doğrulama (736 görüntü): koyun
 P 0,947 R 0,950 mAP50 0,970 · insan mAP50 0,917 · köpek mAP50 0,519 (az örnek).
 
-| Sınav | Beyaz sürü modeli | Karışık sürü modeli |
+İkinci tur (1 Kas sabahı): aynı sette mozaiksiz, düşük öğrenme hızıyla 20 tur daha → koyun P 0,969 R 0,937,
+köpek P 0,923, insan mAP50 0,922. Pakete giren sürüm bu (r2).
+
+| Sınav | Beyaz sürü modeli | Karışık sürü modeli (r2) |
 |---|---|---|
-| 4 bilinen video (160 koyun) | **160/160** | 158/160 (video 13: 44/46) |
+| 4 bilinen video (160 koyun) | **160/160** | 159/160 (video 13: 45/46) |
 | Kapı üstü 5 m / 10 m (47) | 47 / 47 | 47 / 47 |
-| Kahverengi keçi videosu | 76 geçiş, 20 şüpheli, çoğu kaçtı | **84 geçiş, 1 şüpheli**, keçiler tespit ediliyor |
+| Kahverengi keçi videosu | 76 geçiş, 20 şüpheli, çoğu kaçtı | **84 geçiş, 0 şüpheli**, keçiler tespit ediliyor |
 | Beyaz çoban köpeği | **koyun sanıyor** (%62) | koyun saymıyor; çoban "insan" |
 
 Karar: programda **varsayılan = beyaz sürü modeli** (Murat'ın sürüsü açık renk); Ayarlar → Model'den
-"karışık sürü" seçilebilir. Sırada: 51 GB ek ICAERUS verisiyle ikinci tur, hedef tek modelde ikisi de.
+"karışık sürü" seçilebilir. Sırada: 51 GB ek ICAERUS verisi (indirildi) ile üçüncü tur, hedef tek modelde ikisi de.
 
 ## Kurulum testleri (31 Ekim)
 | Ortam | Sonuç |

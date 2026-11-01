@@ -1,0 +1,17 @@
+== 2. tur sınavı 01 Nov 07:19 ==
+-- 4 bilinen video (160) --
+video  8: gerçek  35  sayılan  35  (ters yön 0)
+video 10: gerçek  41  sayılan  41  (ters yön 0)
+video 12: gerçek  38  sayılan  38  (ters yön 0)
+video 13: gerçek  46  sayılan  45  (ters yön 0)
+TOPLAM: gerçek 160  sayılan 159  hata -1  doğruluk %99.4
+-- kapı üstü / keçi / köpek --
+  kapi-ustu-giris-3.mp4: geçen  47 (giriş 0, çıkış 47)  numara 52  şüpheli 0  ort.güven 0.83
+  kapi-ustu-giris-4.mp4: geçen  50 (giriş 50, çıkış 0)  numara 64  şüpheli 0  ort.güven 0.80
+  kapi-ustu-giris-11.mp4: geçen  48 (giriş 0, çıkış 48)  numara 53  şüpheli 0  ort.güven 0.86
+-- val sınıf bazlı --
+                   all        736      20133      0.924       0.73      0.811      0.643
+                 koyun        710      19504      0.969      0.937       0.97      0.792
+                 kopek         29         33      0.923      0.394      0.542      0.471
+                 insan        242        596      0.881      0.859      0.922      0.666
+R2_BITTI
