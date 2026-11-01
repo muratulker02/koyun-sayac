@@ -51,6 +51,7 @@ class Motor:
         self.kayit_klasoru = Path(kayit_klasoru) if kayit_klasoru else None
         self.sayac, self.jpeg, self.hata, self.kare_boyut = None, None, "", None
         self.dur_bayragi = False
+        self.digerleri, self.supheli, self.kutu = {}, [], 0
         self.durum = "calisiyor"
         self.is_parcacigi = threading.Thread(target=self._calis, daemon=True)
         self.is_parcacigi.start()

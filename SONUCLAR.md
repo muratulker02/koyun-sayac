@@ -58,7 +58,8 @@ köpek P 0,923, insan mAP50 0,922. Pakete giren sürüm bu (r2).
 | Beyaz çoban köpeği | **koyun sanıyor** (%62) | koyun saymıyor; çoban "insan" |
 
 Karar: programda **varsayılan = beyaz sürü modeli** (Murat'ın sürüsü açık renk); Ayarlar → Model'den
-"karışık sürü" seçilebilir. Sırada: 51 GB ek ICAERUS verisi (indirildi) ile üçüncü tur, hedef tek modelde ikisi de.
+"karışık sürü" seçilebilir. Demo listesinde keçi (≈92) ve köpekli videolar **kendi modelini** (karışık sürü) kullanır;
+beyaz sürü modeliyle keçi videosu 76 geçiş / 20 şüpheli, kutular yanıp sönüyordu (1 Kas, Murat'ın gözlemi). Sırada: 51 GB ek ICAERUS verisi (indirildi) ile üçüncü tur, hedef tek modelde ikisi de.
 
 ## Kurulum testleri (31 Ekim)
 | Ortam | Sonuç |

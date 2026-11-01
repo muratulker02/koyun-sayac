@@ -360,7 +360,7 @@ async function yenile(){
     $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
     $("#girisK").value = a.giris_kullanici || "";
     $("#modelSec").innerHTML = Object.entries(D.modeller).map(([ad, acik]) => `<option value="${ad}" ${ad === a.model ? "selected" : ""}>${acik}</option>`).join("");
-    $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
+    $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}${d.model ? ` · <b>model: ${D.modeller[d.model] ? D.modeller[d.model].split(":")[0] : d.model}</b>` : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
     document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));
     ayarYuklendi = true;

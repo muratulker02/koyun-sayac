@@ -131,7 +131,8 @@ def demo_bilgi():
 
 def demolar():
     bilgi = demo_bilgi()
-    adlar = sorted(p.name for p in DEMO.glob("*.mp4"))
+    var = {p.name for p in DEMO.glob("*.mp4")}
+    adlar = [ad for ad in bilgi if ad in var] + sorted(var - set(bilgi))  # demolar.json sırası, kalanlar alfabetik
     return [{"ad": ad, **bilgi.get(ad, {})} for ad in adlar]
 
 
@@ -261,7 +262,8 @@ def api_demo():
             durum["mesaj"] = f"Demo bitti — {ozet['cikan']} çıkış, {ozet['giren']} giriş sayıldı."
 
     durum.update(kip="demo", demo=ad, son=(0, 0), mesaj="")
-    motor.model_yolu = model_yolu()
+    ozel = bilgi.get("model")  # demo kendi modelini isteyebilir (ör. keçi/köpek videoları → karışık sürü modeli)
+    motor.model_yolu = str(KOK / "modeller" / ozel) if ozel and (KOK / "modeller" / ozel).exists() else model_yolu()
     motor.cizgi_ayarla(bilgi.get("cizgi", a["cizgi"]), bilgi.get("yon_ters", a["yon_ters"]))
     motor.baslat(str(DEMO / ad), gercek_hiz=d.get("gercek_hiz", True), bitince=bitti)
     return jsonify({"ok": True})
