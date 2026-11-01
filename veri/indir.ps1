@@ -1,4 +1,4 @@
-# ICAERUS (Zenodo) veri setlerini indirir — kaldığı yerden devam eder (curl -C -), bitince açar.
+﻿# ICAERUS (Zenodo) veri setlerini indirir — kaldığı yerden devam eder (curl -C -), bitince açar.
 # Kullanım (PowerShell, repo kökünde):
 #   powershell -ExecutionPolicy Bypass -File veri\indir.ps1            # 3. tur için gerekenler
 #   powershell -ExecutionPolicy Bypass -File veri\indir.ps1 -Hepsi     # + 29 GB ikinci set (disk yeterse)
