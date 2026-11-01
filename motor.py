@@ -12,6 +12,7 @@ import cv2
 from ultralytics import YOLO
 
 from cizgi import CizgiSayaci
+from siniflar import ETIKET, RENK, izlenecek_siniflar, koyun_sinifi
 
 KOYUN_COCO = 18
 
@@ -33,6 +34,8 @@ class Motor:
         self.kare_boyut = None
         self.fps = 0.0
         self.kutu = 0
+        self.koyun = 0
+        self.digerleri = {}      # ekranda görülen köpek/insan kare sayısı
         self.supheli = []
         self.bitince = None
         self.log = print          # app bunu defter.sistem_log'a bağlar
@@ -72,7 +75,7 @@ class Motor:
         s = self.sayac
         return {"durum": self.durum, "hata": self.hata, "kaynak": self.kaynak,
                 "cikan": s.cikan if s else 0, "giren": s.giren if s else 0,
-                "kutu": self.kutu, "fps": round(self.fps, 1), "supheli": len(self.supheli),
+                "kutu": self.kutu, "fps": round(self.fps, 1), "supheli": len(self.supheli), "digerleri": self.digerleri,
                 "izlenen": len(s.gorulme) if s else 0,
                 "cizgi": self.cizgi, "yon_ters": self.yon_ters}
 
@@ -123,11 +126,18 @@ class Motor:
                 self.sayac = CizgiSayaci((0, 0), (0, 0))
                 self.cizgi_ayarla()
             b = r.boxes
-            self.kutu = len(b)
             img = r.orig_img.copy()
             aktif = set()
+            self.kutu = 0
             if b.id is not None:
-                for (x1, y1, x2, y2), tid in zip(b.xyxy.tolist(), b.id.int().tolist()):
+                for (x1, y1, x2, y2), tid, sinif in zip(b.xyxy.tolist(), b.id.int().tolist(), b.cls.int().tolist()):
+                    if sinif != self.koyun:        # köpek / insan: sayılmaz, yalnız gösterilir
+                        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                        cv2.rectangle(img, (x1, y1), (x2, y2), RENK.get(sinif, (200, 200, 200)), 2)
+                        cv2.putText(img, ETIKET.get(sinif, "?"), (x1 + 4, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, RENK.get(sinif, (200, 200, 200)), 2)
+                        self.digerleri[ETIKET.get(sinif, "?")] = self.digerleri.get(ETIKET.get(sinif, "?"), 0) + 1
+                        continue
+                    self.kutu += 1
                     # yeniden bağlanınca takip no'ları sıfırlanır → tur ile ayır
                     anahtar = (tur, tid)
                     aktif.add(anahtar)
@@ -166,7 +176,8 @@ class Motor:
         tur = 0
         try:
             model = YOLO(self.model_yolu)
-            siniflar = None if len(model.names) == 1 else [KOYUN_COCO]
+            siniflar = izlenecek_siniflar(model)
+            self.koyun = koyun_sinifi(model)
             if self._canli_mi():
                 self.log(f"KAMERA bağlanılıyor: {self.kaynak}")
             while not self.dur_bayragi:

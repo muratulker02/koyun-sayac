@@ -53,7 +53,8 @@ def main():
     p.add_argument("--iou", type=float, default=0.7)
     a = p.parse_args()
     model = YOLO(a.model)
-    siniflar = [18] if len(model.names) > 1 else [0]
+    from siniflar import koyun_sinifi
+    siniflar = [koyun_sinifi(model)]
     satirlar, top_g, top_p = [], 0, 0
     for n in a.videolar.split(","):
         video = V / f"Videos/crop_23.11.23-{n}.MP4"

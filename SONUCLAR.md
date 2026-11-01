@@ -41,6 +41,22 @@ Dört farklı model de bu videolarda 47–49 saydı; gerçek sayı büyük ihtim
 Takipçi ayarları (güven eşiği, görüntü boyutu, ByteTrack/BoT-SORT) eğitilmiş modelde fark yaratmadı
 (7 ayarın 5'i 160/160) → programdaki varsayılanlar kaldı.
 
+## İkinci model: `modeller/koyun-birlesik.pt` (karışık sürü, 1 Kasım)
+
+Eğitim: beyaz koyun 1.305 + **etiketli keçi 287** (ICAERUS 14929694) + köpek/insan kareleri 1.589 → 3 sınıf
+(koyun/küçükbaş · köpek · insan), 40 tur, koyun-tepeden.pt'den ince ayar. Doğrulama (736 görüntü): koyun
+P 0,947 R 0,950 mAP50 0,970 · insan mAP50 0,917 · köpek mAP50 0,519 (az örnek).
+
+| Sınav | Beyaz sürü modeli | Karışık sürü modeli |
+|---|---|---|
+| 4 bilinen video (160 koyun) | **160/160** | 158/160 (video 13: 44/46) |
+| Kapı üstü 5 m / 10 m (47) | 47 / 47 | 47 / 47 |
+| Kahverengi keçi videosu | 76 geçiş, 20 şüpheli, çoğu kaçtı | **84 geçiş, 1 şüpheli**, keçiler tespit ediliyor |
+| Beyaz çoban köpeği | **koyun sanıyor** (%62) | koyun saymıyor; çoban "insan" |
+
+Karar: programda **varsayılan = beyaz sürü modeli** (Murat'ın sürüsü açık renk); Ayarlar → Model'den
+"karışık sürü" seçilebilir. Sırada: 51 GB ek ICAERUS verisiyle ikinci tur, hedef tek modelde ikisi de.
+
 ## Kurulum testleri (31 Ekim)
 | Ortam | Sonuç |
 |---|---|

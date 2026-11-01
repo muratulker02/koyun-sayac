@@ -156,6 +156,8 @@
         <input id="suru" type="number" min="0">
         <label>Tolerans (bu kadar farka alarm verme)</label>
         <input id="tolerans" type="number" min="0">
+        <label>Model</label>
+        <select id="modelSec" style="width:100%;font:inherit;padding:8px 10px;border:1px solid var(--cizgi);border-radius:8px;background:#fff"></select>
         <label>Kamera adresi (RTSP)</label>
         <div class="satir"><input id="kamera" type="text" placeholder="rtsp://kullanici:sifre@192.168.1.64:554/stream1"><button id="kameraDeneBtn" style="flex-shrink:0">Dene</button></div>
         <div id="kameraSonuc" class="kucuk"></div>
@@ -273,7 +275,7 @@ async function demoBaslat(ad){
 $("#kaydetBtn").onclick = async () => {
   await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
     rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked,
-    giris_kullanici: $("#girisK").value, giris_sifre: $("#girisS").value});
+    giris_kullanici: $("#girisK").value, giris_sifre: $("#girisS").value, model: $("#modelSec").value});
   $("#girisS").value = ""; $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
 };
 $("#kameraDeneBtn").onclick = async () => {
@@ -357,6 +359,7 @@ async function yenile(){
     $("#suru").value = a.suru; $("#tolerans").value = a.tolerans; $("#kamera").value = a.kamera;
     $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
     $("#girisK").value = a.giris_kullanici || "";
+    $("#modelSec").innerHTML = Object.entries(D.modeller).map(([ad, acik]) => `<option value="${ad}" ${ad === a.model ? "selected" : ""}>${acik}</option>`).join("");
     $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';
     document.querySelectorAll("[data-demo]").forEach(b => b.onclick = () => demoBaslat(b.dataset.demo));

@@ -4,9 +4,9 @@ set -e
 cd "$(dirname "$0")"
 AD="KoyunSayaci-$(date +%Y%m%d)"
 P="/tmp/$AD"; rm -rf "$P"; mkdir -p "$P/modeller" "$P/test-video" "$P/takip" "$P/arayuz" "$P/kayitlar"
-cp app.py motor.py cizgi.py defter.py bildir.py fotosay.py say.py test_bildir.py README.md LICENSE KURULUM.md SONUCLAR.md kur.bat baslat.vbs kur.command "$P/"
+cp app.py motor.py cizgi.py defter.py bildir.py fotosay.py siniflar.py say.py test_bildir.py README.md LICENSE KURULUM.md SONUCLAR.md kur.bat baslat.vbs kur.command "$P/"
 cp arayuz/index.html "$P/arayuz/"; cp takip/*.yaml "$P/takip/"
-cp modeller/koyun-tepeden.pt "$P/modeller/"
+cp modeller/koyun-tepeden.pt modeller/koyun-birlesik.pt "$P/modeller/"
 # küçük demolar (gerçek sayısı bilinen 2 video + kapı üstü 1)
 for v in tepeden-agila-giris-12.mp4 tepeden-agila-giris-13.mp4 kapi-ustu-giris-3.mp4; do cp "test-video/$v" "$P/test-video/"; done
 python3 - "$P/test-video" <<'EOF'

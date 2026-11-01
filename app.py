@@ -27,12 +27,21 @@ VIDEO_KAYIT = KOK / "kayitlar" / "video"
 YUKLENEN = KOK / "yuklenen"          # telefondan/drone'dan gelen fotoğraf-videolar (eğitim için de saklanır)
 VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False,
               "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True,
-              "giris_kullanici": "", "giris_sifre_hash": ""}
+              "giris_kullanici": "", "giris_sifre_hash": "", "model": "koyun-tepeden.pt"}
+
+
+MODELLER = {  # Ayarlar'daki seçenekler: dosya → açıklama
+    "koyun-tepeden.pt": "Beyaz/açık renkli sürü (en hassas, 160/160)",
+    "koyun-birlesik.pt": "Karışık sürü: koyun + keçi/koyu renk, köpek ve insanı ayırır",
+}
 
 
 def model_yolu():
-    ozel = KOK / "modeller" / "koyun-tepeden.pt"
-    return str(ozel if ozel.exists() else KOK / "modeller" / "yolo11s.pt")
+    secim = (json.loads(AYAR.read_text()).get("model") if AYAR.exists() else None) or "koyun-tepeden.pt"
+    for ad in (secim, "koyun-tepeden.pt", "yolo11s.pt"):
+        if (KOK / "modeller" / ad).exists():
+            return str(KOK / "modeller" / ad)
+    return str(KOK / "modeller" / "yolo11s.pt")
 
 
 app = Flask(__name__, static_folder=str(KOK / "arayuz"))
@@ -223,6 +232,7 @@ def api_durum():
                     "olaylar": bugun["olaylar"][-8:][::-1], "disarida": defter.disarida(bugun),
                     "gecmis": defter.gecmis(), "videolar": videolar, "sistem": defter.son_sistem(12),
                     "model": Path(motor.model_yolu).name,
+                    "modeller": {ad: acik for ad, acik in MODELLER.items() if (KOK / "modeller" / ad).exists()},
                     "telegram": bool(e.get("TELEGRAM_TOKEN") and e.get("TELEGRAM_CHAT_ID"))})
 
 
@@ -295,6 +305,8 @@ def api_ayarlar():
     for k in ("kamera", "rapor_saati"):
         if k in d:
             a[k] = str(d[k]).strip()
+    if d.get("model") in MODELLER and (KOK / "modeller" / d["model"]).exists():
+        a["model"] = d["model"]
     for k in ("otomatik_baslat", "video_kaydet"):
         if k in d:
             a[k] = bool(d[k])

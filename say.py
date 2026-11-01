@@ -33,7 +33,7 @@ def say(a):
     kare = 0
     t0 = time.time()
     akis = model.track(source=a.kaynak, stream=True, persist=True, tracker=a.takip,
-                       classes=None if len(model.names) == 1 else [int(s) for s in a.siniflar.split(",")],
+                       classes=[__import__('siniflar').koyun_sinifi(model)],
                        conf=a.guven, imgsz=a.boyut, device=a.cihaz, verbose=False)
     for r in akis:
         h, w = r.orig_shape

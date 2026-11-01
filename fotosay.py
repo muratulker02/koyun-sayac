@@ -9,7 +9,7 @@ from pathlib import Path
 import cv2
 from ultralytics import YOLO
 
-KOYUN_COCO = 18
+from siniflar import koyun_sinifi
 
 
 def _ciz(img, kutular, etiketler, renk=(60, 200, 60)):
@@ -28,7 +28,7 @@ def _kucult(img, en=1280):
 
 def say_foto(model_yolu, yol, cikti, guven=0.25):
     model = YOLO(model_yolu)
-    siniflar = None if len(model.names) == 1 else [KOYUN_COCO]
+    siniflar = [koyun_sinifi(model)]
     img = cv2.imread(str(yol))
     if img is None:
         raise ValueError("fotoğraf okunamadı")
@@ -45,7 +45,7 @@ def say_video(model_yolu, yol, cikti, guven=0.25, en_az_kare=5):
     """Videodaki farklı koyunları takip no'larıyla sayar. Hareketsiz sürüde tek karedeki en çok sayı
     daha güvenilirdir; ikisini de döndürür."""
     model = YOLO(model_yolu)
-    siniflar = None if len(model.names) == 1 else [KOYUN_COCO]
+    siniflar = [koyun_sinifi(model)]
     gorulme, en_cok, en_cok_kare, ilk_kare, kare_no = {}, 0, None, None, 0
     for r in model.track(source=str(yol), stream=True, persist=False, tracker="bytetrack.yaml",
                          classes=siniflar, conf=guven, imgsz=960, verbose=False):
