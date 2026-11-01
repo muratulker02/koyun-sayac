@@ -24,3 +24,7 @@ weights/
 *.pth
 runs/
 devir/
+veri/coco-koyun/
+veri/egitim-r3/
+veri/r3*-adim/
+veri/*-adim/

@@ -37,27 +37,44 @@ def main():
     p.add_argument("--esik", type=float, default=0.5, help="koyun güven eşiği")
     p.add_argument("--koyun-yalniz", type=float, default=0.5, help="köpek/insan olmayan karelerin alınma oranı")
     p.add_argument("--boyut", type=int, default=1280)
+    p.add_argument("--koyun-kaynak", choices=["model", "world", "ikisi"], default="model",
+                   help="koyun kutuları: bizim tepeden model / YOLO-World 'sheep' (yandan çekimler için) / ikisinin birleşimi")
+    p.add_argument("--atla", default=None, help="bu klasördeki (images/*/) kare adları atlanır (eski sette zaten var)")
     a = p.parse_args()
+    atla = set()
+    if a.atla:
+        atla = {q.stem for q in Path(a.atla).rglob("*.jpg")}
 
     OUT = Path(a.cikti)
     for d in ("images/train", "images/val", "labels/train", "labels/val", "kontrol"):
         (OUT / d).mkdir(parents=True, exist_ok=True)
     koyun_m = YOLO(str(KOK / "modeller" / "koyun-birlesik.pt"))
     genel_m = YOLO(str(KOK / "modeller" / "yolov8s-worldv2.pt"))
-    genel_m.set_classes(["dog", "person"])
+    genel_m.set_classes(["dog", "person", "sheep"])
+    SHEEP = 2
     random.seed(7)
     sayac = {"kare": 0, "koyun_kutu": 0, "kopek_kutu": 0, "insan_kutu": 0, "atlanan_bos": 0}
 
     def isle(img, ad):
         h, w = img.shape[:2]
-        k = koyun_m.predict(img, imgsz=a.boyut, conf=a.esik, classes=[0], verbose=False)[0]
-        koyunlar = [(tuple(b), c) for b, c in zip(k.boxes.xyxy.tolist(), k.boxes.conf.tolist())]
+        if ad in atla:
+            return False
         g = genel_m.predict(img, imgsz=a.boyut, conf=0.3, verbose=False)[0]
+        koyunlar = []
+        if a.koyun_kaynak in ("model", "ikisi"):
+            k = koyun_m.predict(img, imgsz=a.boyut, conf=a.esik, classes=[0], verbose=False)[0]
+            koyunlar = [(tuple(b), c) for b, c in zip(k.boxes.xyxy.tolist(), k.boxes.conf.tolist())]
+        if a.koyun_kaynak in ("world", "ikisi"):
+            for b, c, conf in zip(g.boxes.xyxy.tolist(), g.boxes.cls.int().tolist(), g.boxes.conf.tolist()):
+                if c == SHEEP and conf >= a.esik and not any(ortusme(tuple(b), kb) > 0.5 for kb, _ in koyunlar):
+                    koyunlar.append((tuple(b), conf))
         satirlar, kirpimlar, kopek, insan = [], {}, 0, 0
         for (x1, y1, x2, y2), c in koyunlar:
             satirlar.append(f"0 {(x1+x2)/2/w:.6f} {(y1+y2)/2/h:.6f} {(x2-x1)/w:.6f} {(y2-y1)/h:.6f}")
         for b, c, conf in zip(g.boxes.xyxy.tolist(), g.boxes.cls.int().tolist(), g.boxes.conf.tolist()):
             b = tuple(b)
+            if c == SHEEP:
+                continue
             if c == 0:   # dog
                 if conf < 0.40 or any(kc >= 0.75 and ortusme(b, kb) > 0.5 for kb, kc in koyunlar):
                     continue

@@ -2,7 +2,10 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f7d3b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Koyun Sayacı">
 <title>Koyun Sayacı</title>
 <style>
   :root{
@@ -11,6 +14,10 @@
     --mavi:#1f5f8b; --sari:#b7791f; --sari-a:#fbf1dc; --golge:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
   }
   *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{overflow-x:hidden}
+  img,canvas,video{max-width:100%}
+  button{min-height:40px}
   body{margin:0;background:var(--bg);color:var(--metin);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
   header{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--cizgi);background:var(--kart)}
   header h1{font-size:20px;margin:0}
@@ -19,7 +26,30 @@
   .rozet.baglaniyor{background:var(--sari-a);color:var(--sari)}
   .rozet.hata{background:var(--kirmizi-a);color:var(--kirmizi)}
   main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;padding:18px 22px;max-width:1400px;margin:0 auto}
-  @media (max-width:980px){main{grid-template-columns:1fr}}
+  @media (max-width:980px){main{grid-template-columns:1fr;padding:14px}}
+  @media (max-width:640px){
+    header{flex-wrap:wrap;gap:8px;padding:10px 14px}
+    header h1{font-size:18px}
+    header #modelBilgi{margin-left:0;width:100%}
+    main{padding:10px;gap:12px}
+    .kart{padding:12px;border-radius:12px}
+    .sayaclar{gap:8px;margin-bottom:10px}
+    .sayac{padding:10px 10px}
+    .sayac b{font-size:30px}
+    .sayac small{font-size:10px;letter-spacing:.03em}
+    .ekran{min-height:200px}
+    .arac{gap:6px}
+    .arac button{flex:1 1 45%;min-height:44px}
+    .arac .ipucu{flex-basis:100%}
+    button{min-height:44px}
+    .demo{flex-direction:row;align-items:center}
+    .demo button{min-height:40px;padding:8px 12px}
+    table{font-size:13px} th,td{padding:7px 4px} td:first-child{white-space:nowrap}
+    .mesaj{font-size:15px;padding:12px}
+    input[type=text],input[type=number],input[type=password],input[type=time]{font-size:16px;padding:10px}  /* iOS yakınlaştırmasını önler */
+    .birak{padding:22px 12px;font-size:15px}
+  }
+  @media (hover:none){button:hover{border-color:var(--cizgi)}}
   .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;box-shadow:var(--golge);padding:16px}
   .sayaclar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
   .sayac{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;padding:12px 16px;box-shadow:var(--golge)}
@@ -47,7 +77,7 @@
   .yan{display:flex;flex-direction:column;gap:14px}
   .demo{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--cizgi)}
   .demo:first-of-type{border-top:0}
-  .demo .ad{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .demo .ad{font-size:13px;min-width:0;overflow-wrap:anywhere}
   .demo .ad small{display:block;color:var(--soluk);font-size:11px}
   .demo button{padding:6px 10px;font-size:13px;flex-shrink:0}
   label{display:block;font-size:13px;color:var(--soluk);margin:10px 0 4px}
@@ -127,6 +157,8 @@
         <input type="file" id="dosya" accept="image/*,video/*" style="display:none">
         <span id="birakYazi">📂 Dosya seç ya da buraya bırakın</span>
       </label>
+      <input type="file" id="dosyaKamera" accept="image/*" capture="environment" style="display:none">
+      <button id="kameraCekBtn" class="mavi" style="width:100%;margin-top:8px">📸 Telefon kamerasıyla çek ve say</button>
       <div id="yukleSonuc" style="display:none;margin-top:10px">
         <div class="satir"><b id="yukleSayi" style="font-size:32px;color:var(--yesil)"></b><span id="yukleAlt" class="kucuk"></span></div>
         <a id="yukleLink" target="_blank"><img id="yukleImg" style="width:100%;border-radius:10px;margin-top:8px;display:block" alt="sayım sonucu"></a>
@@ -165,6 +197,8 @@
         <input id="raporSaati" type="time">
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="otomatik"> Program açılınca izleme kendiliğinden başlasın</label>
         <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="videoKaydet"> Geçiş videolarını saatlik kaydet</label>
+        <label style="display:flex;gap:6px;align-items:center;color:var(--metin)"><input type="checkbox" id="agErisim"> Telefon / tabletten erişim (aynı Wi-Fi; şifre zorunlu)</label>
+        <div id="agBilgi" class="kucuk" style="margin:4px 0 0 24px"></div>
         <label>Giriş kullanıcı adı <span class="kucuk">(boş = şifresiz, yalnız bu bilgisayar)</span></label>
         <input id="girisK" type="text" autocomplete="off" placeholder="örn. ahmet">
         <label>Giriş şifresi <span class="kucuk">(değiştirmek için yazın)</span></label>
@@ -274,7 +308,7 @@ async function demoBaslat(ad){
 
 $("#kaydetBtn").onclick = async () => {
   await api("/api/ayarlar", {suru: $("#suru").value, tolerans: $("#tolerans").value, kamera: $("#kamera").value,
-    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked,
+    rapor_saati: $("#raporSaati").value, otomatik_baslat: $("#otomatik").checked, video_kaydet: $("#videoKaydet").checked, ag_erisim: $("#agErisim").checked,
     giris_kullanici: $("#girisK").value, giris_sifre: $("#girisS").value, model: $("#modelSec").value});
   $("#girisS").value = ""; $("#ayarSonuc").textContent = "Kaydedildi ✓"; yenile();
 };
@@ -315,6 +349,8 @@ async function dosyaSay(f){
   $("#yukleImg").src = r.goruntu + "?" + Date.now(); $("#yukleLink").href = r.goruntu;
 }
 $("#dosya").onchange = e => dosyaSay(e.target.files[0]);
+$("#dosyaKamera").onchange = e => dosyaSay(e.target.files[0]);
+$("#kameraCekBtn").onclick = () => $("#dosyaKamera").click();
 birak.ondragover = e => { e.preventDefault(); birak.classList.add("ustunde"); };
 birak.ondragleave = () => birak.classList.remove("ustunde");
 birak.ondrop = e => { e.preventDefault(); birak.classList.remove("ustunde"); dosyaSay(e.dataTransfer.files[0]); };
@@ -337,7 +373,10 @@ async function yenile(){
   $("#bilgi").textContent = D.durum === "calisiyor"
     ? `${D.kip === "demo" ? `demo: ${D.cikan} çıktı, ${D.giren} girdi · ` : ""}ekranda ${D.kutu} koyun · ${D.izlenen} numara verildi${D.supheli ? ` · ⚠️ ${D.supheli} şüpheli` : ""} · ${D.fps} kare/sn`
     : (D.hata ? "Hata: " + D.hata : "");
-  $("#modelBilgi").textContent = "model: " + D.model;
+  if (D.ag) $("#agBilgi").innerHTML = D.ag.aktif
+      ? `Telefondan aç: <b>http://${D.ag.adres}:${D.ag.port}</b>${D.giris_acik ? "" : " — <span style='color:var(--kirmizi)'>önce kullanıcı adı/şifre belirleyin</span>"}`
+      : ($("#agErisim").checked && D.ayarlar.ag_erisim ? "Kaydedildi; program yeniden başlatılınca açılır." : "Kapalı: yalnız bu bilgisayardan açılır.");
+  $("#modelBilgi").textContent = "model: " + ((D.modeller && D.modeller[D.model]) ? D.modeller[D.model].split(":")[0] : D.model);
   $("#cikisLink").style.display = D.giris_acik ? "inline" : "none";
   $("#durBtn").disabled = !["calisiyor", "baglaniyor"].includes(D.durum);
   $("#izleBtn").disabled = izleme && D.durum !== "hata";
@@ -359,6 +398,7 @@ async function yenile(){
     $("#suru").value = a.suru; $("#tolerans").value = a.tolerans; $("#kamera").value = a.kamera;
     $("#raporSaati").value = a.rapor_saati; $("#otomatik").checked = a.otomatik_baslat; $("#videoKaydet").checked = a.video_kaydet;
     $("#girisK").value = a.giris_kullanici || "";
+    $("#agErisim").checked = !!a.ag_erisim;
     $("#modelSec").innerHTML = Object.entries(D.modeller).map(([ad, acik]) => `<option value="${ad}" ${ad === a.model ? "selected" : ""}>${acik}</option>`).join("");
     $("#demolar").innerHTML = D.demolar.map(d => `<div class="demo"><div class="ad" title="${d.ad}">${d.baslik || d.ad}<small>${d.gercek ? "gerçek: " + d.gercek + " koyun" : "sayısı bilinmiyor"}${d.aciklama ? " · " + d.aciklama : ""}${d.model ? ` · <b>model: ${D.modeller[d.model] ? D.modeller[d.model].split(":")[0] : d.model}</b>` : ""}</small></div><button data-demo="${d.ad}">▶ Test et</button></div>`).join("")
       || '<div class="kucuk">test-video klasörüne .mp4 koyun.</div>';

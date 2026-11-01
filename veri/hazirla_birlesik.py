@@ -13,7 +13,7 @@ import sys
 if "--yeniden" in sys.argv:
     shutil.rmtree(cik, ignore_errors=True)   # sıfırdan kur; bayraksız çağrı mevcut sete yalnız ekler (devir paketi için)
 random.seed(11)
-say = {"koyun_train": 0, "koyun_val": 0, "keci_train": 0, "keci_val": 0, "kopek_train": 0, "kopek_val": 0, "r3_train": 0, "r3_val": 0}
+say = {"koyun_train": 0, "koyun_val": 0, "keci_train": 0, "keci_val": 0, "kopek_train": 0, "kopek_val": 0, "r3_train": 0, "r3_val": 0, "coco_train": 0, "coco_val": 0}
 
 
 def bagla(img, lab, bolum, onek):
@@ -71,6 +71,15 @@ if (R / "images").exists():
             lab = R / "labels" / bolum / (img.stem + ".txt")
             if lab.exists():
                 bagla(img, lab, bolum, "r3_"); say[f"r3_{bolum}"] += 1
+
+# 5) COCO 'sheep' — yerden/yandan çekilmiş fotoğraflar (her açıdan çalışma hedefi), veri/coco_koyun_indir.py çıktısı (varsa)
+C = KOK / "coco-koyun"
+if (C / "images").exists():
+    for bolum in ("train", "val"):
+        for img in (C / "images" / bolum).glob("*.jpg"):
+            lab = C / "labels" / bolum / (img.stem + ".txt")
+            if lab.exists():
+                bagla(img, lab, bolum, ""); say[f"coco_{bolum}"] += 1
 
 (cik / "veri.yaml").write_text(
     f"path: {cik.resolve()}\ntrain: images/train\nval: images/val\nnames:\n  0: koyun\n  1: kopek\n  2: insan\n")

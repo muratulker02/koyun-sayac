@@ -27,7 +27,7 @@ VIDEO_KAYIT = KOK / "kayitlar" / "video"
 YUKLENEN = KOK / "yuklenen"          # telefondan/drone'dan gelen fotoğraf-videolar (eğitim için de saklanır)
 VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1], "yon_ters": False,
               "rapor_saati": "19:30", "otomatik_baslat": True, "video_kaydet": True,
-              "giris_kullanici": "", "giris_sifre_hash": "", "model": "koyun-tepeden.pt"}
+              "giris_kullanici": "", "giris_sifre_hash": "", "model": "koyun-tepeden.pt", "ag_erisim": False}
 
 
 MODELLER = {  # Ayarlar'daki seçenekler: dosya → açıklama
@@ -69,8 +69,26 @@ def giris_gerekli():
     return bool(a.get("giris_kullanici") and a.get("giris_sifre_hash"))
 
 
+def yerel_mi():
+    return (request.remote_addr or "") in ("127.0.0.1", "::1", "localhost")
+
+
+def ag_adresi():
+    """Bu bilgisayarın yerel ağdaki adresi (telefon/tablet için)."""
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("10.255.255.255", 1)); ip = s.getsockname()[0]; s.close()
+        return ip
+    except Exception:
+        return ""
+
+
 @app.before_request
 def giris_kontrol():
+    if not yerel_mi() and not giris_gerekli():
+        # ağdan gelen istek ama şifre tanımlı değil → açık kapı bırakma
+        return ("<meta charset=utf-8><body style='font:16px system-ui;padding:30px'>🐑 Koyun Sayacı<br><br>"
+                "Telefondan erişim için önce bilgisayarda <b>Ayarlar → Giriş</b> bölümünde kullanıcı adı ve şifre belirleyin.</body>"), 403
     if request.path.startswith("/giris") or not giris_gerekli() or session.get("giris"):
         return None
     if request.path.startswith("/api/"):
@@ -234,6 +252,7 @@ def api_durum():
                     "gecmis": defter.gecmis(), "videolar": videolar, "sistem": defter.son_sistem(12),
                     "model": Path(motor.model_yolu).name,
                     "modeller": {ad: acik for ad, acik in MODELLER.items() if (KOK / "modeller" / ad).exists()},
+                    "ag": {"aktif": AG_ACIK, "adres": ag_adresi(), "port": int(os.environ.get("KOYUN_PORT", 8780))},
                     "telegram": bool(e.get("TELEGRAM_TOKEN") and e.get("TELEGRAM_CHAT_ID"))})
 
 
@@ -309,7 +328,7 @@ def api_ayarlar():
             a[k] = str(d[k]).strip()
     if d.get("model") in MODELLER and (KOK / "modeller" / d["model"]).exists():
         a["model"] = d["model"]
-    for k in ("otomatik_baslat", "video_kaydet"):
+    for k in ("otomatik_baslat", "video_kaydet", "ag_erisim"):
         if k in d:
             a[k] = bool(d[k])
     if "giris_kullanici" in d:
@@ -404,7 +423,11 @@ def api_telegram_test():
     return jsonify({"ok": gonder("🐑 Koyun Sayacı test mesajı — bildirimler çalışıyor.")})
 
 
+AG_ACIK = False
+
 if __name__ == "__main__":
-    defter.sistem_log(f"PROGRAM açıldı, model {Path(model_yolu()).name}")
+    AG_ACIK = bool(os.environ.get("KOYUN_HOST")) or bool(ayarlar().get("ag_erisim"))
+    host = os.environ.get("KOYUN_HOST") or ("0.0.0.0" if AG_ACIK else "127.0.0.1")
+    defter.sistem_log(f"PROGRAM açıldı, model {Path(model_yolu()).name}" + (f", ağdan erişim açık ({ag_adresi()})" if AG_ACIK else ""))
     threading.Thread(target=bekci, daemon=True).start()
-    app.run(host="127.0.0.1", port=int(os.environ.get("KOYUN_PORT", 8780)), threaded=True)
+    app.run(host=host, port=int(os.environ.get("KOYUN_PORT", 8780)), threaded=True)

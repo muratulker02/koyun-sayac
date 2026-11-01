@@ -45,7 +45,12 @@ köpek sayılmıyor. Birini kaybediyorsa eski model kalır.
 Mac'teki devir sunucusu: `cd devir && python3 -m http.server 8790 --bind <Tailscale IP>` (dosyalar: repo tar,
 egitim-birlesik.tar, test-video.tar, modeller/). Ofis PC yalnız Tailscale üzerinden ulaşır.
 
-### Kaldığı yer (1 Kas 20:00)
+### Kaldığı yer (1 Kas 23:45) — Murat: ofis PC kolu İPTAL, her şey Mac'te
+Ofis PC'deki süreçler durduruldu, yarım indirmeler silindi; `C:\Users\pamus\KoyunSayaci-egitim` (4,6 GB: repo + ortam) duruyor, istenirse silinir.
+Mac: `veri/zincir_r3a.sh` tüm yerel veriyle (114 video + yandan + COCO 1.594 foto) 30 tur eğitiyor; `veri/icaerus/gece-indir.sh` 01:00'da
+kalan ICAERUS setlerini (4,8 + 22 + 29 GB) indirir → sabah son tur.
+
+### Önceki not (1 Kas 20:00)
 repo + kurulum bitti; 9,8 GB eğitim seti aktarımı ofisten ~1 MB/s gidiyordu, Murat "evde internet hızlı, orada
 yapacağız" dedi → durduruldu (PC'deki yarım tar sıfırlandı, baştan iner). **Evden sürdürmek:** Mac'te
 `devir/evden-baslat.sh` (sunucuyu açar + SSH'ta zinciri kaldığı adımdan çalıştırır). Not: Mac'in Tailscale IP'si evde

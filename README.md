@@ -61,3 +61,10 @@ günlerinin görüntüsüyle bir tur daha eğitmek doğruluğu sizin kapınıza 
 ## Lisans
 
 Kod: MIT. Eğitim verisi ICAERUS (CC BY 4.0) — https://icaerus.eu
+
+## Telefon / tablet
+
+Arayüz telefon ve tablet ekranına uyar. Başka cihazdan açmak için bilgisayarda **Ayarlar → Telefon / tabletten erişim**
+kutusunu işaretleyin, **kullanıcı adı ve şifre** belirleyin (ağdan gelen bağlantılara şifre zorunludur), programı yeniden
+başlatın; ekranda görünen `http://<bilgisayar-ip>:8780` adresini aynı Wi-Fi'daki telefonda açın. "📸 Telefon kamerasıyla
+çek ve say" düğmesi doğrudan kamerayı açar. Ana ekrana eklenirse uygulama gibi açılır.
