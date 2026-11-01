@@ -72,6 +72,15 @@ if (R / "images").exists():
             if lab.exists():
                 bagla(img, lab, bolum, "r3_"); say[f"r3_{bolum}"] += 1
 
+# 4b) 4. tur sözde etiketler (varsa)
+R4 = KOK / "egitim-r4/set"
+if (R4 / "images").exists():
+    for bolum in ("train", "val"):
+        for img in (R4 / "images" / bolum).glob("*.jpg"):
+            lab = R4 / "labels" / bolum / (img.stem + ".txt")
+            if lab.exists():
+                bagla(img, lab, bolum, "r4_"); say[f"r3_{bolum}"] += 1
+
 # 5) COCO 'sheep' — yerden/yandan çekilmiş fotoğraflar (her açıdan çalışma hedefi), veri/coco_koyun_indir.py çıktısı (varsa)
 C = KOK / "coco-koyun"
 if (C / "images").exists():

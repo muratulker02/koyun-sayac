@@ -48,7 +48,8 @@ def main():
     OUT = Path(a.cikti)
     for d in ("images/train", "images/val", "labels/train", "labels/val", "kontrol"):
         (OUT / d).mkdir(parents=True, exist_ok=True)
-    koyun_m = YOLO(str(KOK / "modeller" / "koyun-birlesik.pt"))
+    import os
+    koyun_m = YOLO(str(KOK / os.environ.get("KOYUN_MODEL", "modeller/koyun-birlesik.pt")))
     genel_m = YOLO(str(KOK / "modeller" / "yolov8s-worldv2.pt"))
     genel_m.set_classes(["dog", "person", "sheep"])
     SHEEP = 2
