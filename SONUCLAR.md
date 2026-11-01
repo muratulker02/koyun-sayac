@@ -74,6 +74,25 @@ baş sayımı: **83 küçükbaş (±3)**, 2 insan. "≈92" eski beyaz modelin k�
 
 Sonuç: elle 83, model 84 → %99; çizgi yeri sonucu değiştirmiyor.
 
+## Demo videoları yeniden kesildi (1 Kas öğleden sonra, Murat'ın gözlemi)
+Murat: "sayım çizgisi ortada, videolar fazla kırpılmış, koyunlar kenardan başlıyor". ICAERUS'un 4 kesiti (35/41/38/46) sürünün
+ortasından başlıyordu (ör. #1: koyunlar 33. sn'de giriyor, kesit 41. sn'de başlıyor; ilk karede 46 koyun, 4'ü çizgiyi geçmiş).
+Tüm demolar **tam kaynaktan, ilk koyundan 5 sn önce** başlayacak şekilde yeniden kesildi (1280×720, 15 kare/sn); yandan çekimler
+listeden çıkarıldı. Tam videolarda programın sayımı (960 px, orta çizgi):
+
+| Video (set1 23.11.23-*) | Sayılan | Not |
+|---|---|---|
+| Tepeden giriş #1 (-8) | 47 | kesit 35/35 |
+| Tepeden giriş #2 (-10) | 47 | kesit 41/41 |
+| Tepeden giriş #3 (-12) | 47 | kesit 38/38 (29 sn'de kesilince 45 → son 2 koyun 29. sn'den sonra geçiyor) |
+| Tepeden giriş #4 (-13) | 47 | kesit 46/46 |
+| Kapı üstü 5 m / 6 m / 10 m (-3/-4/-11) | 47 / 47 / 47 | veri seti "≈50" diyor |
+| Köpekli sürü (23.11.10-1, karışık model) | 47 | köpek sayılmadı |
+| Kahverengi keçi (set12, karışık model) | 84 | elle 83 |
+
+Aynı çiftlikte aynı günlerde çekilen 7 videonun hepsi **47** veriyor → sürü 47; bu, kesit doğrulukları (160/160) ile
+birlikte güçlü bir kanıt. Demo kartlarında gerçek = 47 yazıyor.
+
 ## Kurulum testleri (31 Ekim)
 | Ortam | Sonuç |
 |---|---|
