@@ -95,8 +95,8 @@ a{color:var(--mavi)}
   <ul>
     <li><b>Ne yapar:</b> Ağıl kapısının üstündeki kameradan geçen koyunları tek tek sayar, günün giren/çıkan toplamını tutar, akşam Telegram'a özet gönderir ("700 çıktı, 698 girdi — 2 eksik").</li>
     <li><b>Doğruluk:</b> Kaç koyun geçtiği kesin bilinen 4 videoda 160/160, aynı sürünün 5 farklı çekiminde 47/47, kahverengi keçi sürüsünde 84 (elle 83). Köpek ve insan sayılmaz.</li>
-    <li><b>Ne gerekir:</b> Kapının üstüne 1 adet PoE IP kamera, kablo ve PoE güç kaynağı, bir bilgisayar (ekran kartlı Windows PC ya da Mac mini). Yazılım hazır, lisans ücreti yok.</li>
-    <li><b>Maliyet (yaklaşık, Kasım 2026):</b> kamera + ağ malzemesi ₺6.000–10.000; bilgisayar ₺40.000–70.000 (mevcut ekran kartlı bir PC varsa ₺0). Toplam ₺46.000–80.000. Ayrıntı aşağıda.</li>
+    <li><b>Ne gerekir:</b> Kapının üstüne, 3–6 m yüksekliğe (ahır kirişi/tavanı yeter, direk gerekmez) 1 adet geniş açılı PoE IP kamera, kablo ve PoE güç kaynağı, bir bilgisayar: <b>önerilen Mac mini M4</b> (avuç içi boyutunda, sessiz, az elektrik). Yazılım hazır, lisans ücreti yok.</li>
+    <li><b>Maliyet (yaklaşık, Kasım 2026):</b> kamera + ağ malzemesi ₺5.000–9.000; Mac mini M4 ₺40.000–48.000. <b>Toplam ₺45.000–57.000.</b> Elde ekran kartlı bir Windows PC varsa bilgisayar ₺0. Ayrıntı aşağıda.</li>
     <li><b>Sonraki adım:</b> kamera takılır, ilk haftanın görüntüsüyle ağıla özel ince ayar yapılır, sonra günlük kullanıma geçilir. Kurulum yarım gün.</li>
   </ul>
 </section>
@@ -139,15 +139,15 @@ a{color:var(--mavi)}
 <section class="not">
   <ul>
     <li><b>Kamera tepeden bakmalı.</b> Sistem kapının üstünden, dik aşağı bakan kameraya göre eğitildi. Yandan çekimde koyunlar birbirini kapattığı için kesin sayım hiçbir yöntemle güvenilir olmaz; yandan fotoğrafta "yaklaşık kaç koyun var" sorusuna cevap verir.</li>
-    <li><b>Her ağıl farklı.</b> Buradaki videolar Fransa'daki bir çiftlikten. Sizin kapınız, ışığınız ve kamera açınız farklı olacağı için kurulumdan sonra ilk haftanın görüntüsüyle kısa bir ince ayar yapılır. Bu beklenen bir adımdır.</li>
+    <li><b>Her ağıl farklı.</b> Buradaki videolar Fransa'daki bir çiftlikten, kamera 5–10 m yükseklikte. 3–6 m'lik alçak ahırda koyunlar ekranda daha büyük görünür; 5 ve 6 m'lik kapı videoları bu duruma en yakın örneklerdir ve ikisi de 47/47 çıktı. 3 m için ilk hafta ince ayarı özellikle önemlidir. Sizin kapınız, ışığınız ve kamera açınız farklı olacağı için kurulumdan sonra ilk haftanın görüntüsüyle kısa bir ince ayar yapılır. Bu beklenen bir adımdır.</li>
     <li><b>Çok sıkışık geçişte</b> iki koyun üst üste binerse tek sayılabilir. Kapı genişliği ve kamera yüksekliği buna göre ayarlanır.</li>
   </ul>
 </section>
 
 <h2>Çiftlikte nasıl çalışır</h2>
 <section class="adim">
-  <div class="kutu"><b>1. Kamera</b>Kapının tam üstüne, 5–10 m yüksekliğe, dik aşağı bakan bir kamera. Mevcut IP kamera kullanılabilir.</div>
-  <div class="kutu"><b>2. Bilgisayar</b>Kamera görüntüsünü izleyen bir bilgisayar (Windows ya da Mac). Günün giren ve çıkan sayısını tutar, videoyu kaydeder.</div>
+  <div class="kutu"><b>1. Kamera</b>Kapının tam üstüne, 3–6 m yüksekliğe, dik aşağı bakan geniş açılı bir kamera. Alçak ahırda kirişe takılır, direk gerekmez. RTSP veren mevcut IP kamera kullanılabilir.</div>
+  <div class="kutu"><b>2. Bilgisayar</b>Kamera görüntüsünü izleyen küçük bir bilgisayar (önerilen Mac mini M4). Günün giren ve çıkan sayısını tutar, videoyu kaydeder. Ahırda durmak zorunda değil.</div>
   <div class="kutu"><b>3. Telefona haber</b>Akşam belirlenen saatte Telegram'a özet gelir: "700 çıktı, 698 girdi — 2 eksik". Telefondan ya da tabletten anlık sayaç izlenir.</div>
 </section>
 
@@ -160,7 +160,7 @@ a{color:var(--mavi)}
   <thead><tr><th>Parça</th><th>Ne olmalı</th><th>Örnek</th><th>Yaklaşık fiyat</th></tr></thead>
   <tbody>
     <tr><td><b>Kamera</b> (1 adet)</td>
-        <td>IP kamera, PoE (tek kabloyla hem güç hem görüntü), 4 MP, dış mekân (IP66/67), gece için kızılötesi, <b>RTSP</b> yayın verebilmeli. Lens: 5–6 m yükseklik için 2,8 mm; 8–10 m için 4 mm. Sabit lens yeterli, balık gözü ve döner (PTZ) kamera olmaz. Wi‑Fi ve yalnız buluttan çalışan kameralar (RTSP vermeyen) uygun değil.</td>
+        <td>IP kamera, PoE (tek kabloyla hem güç hem görüntü), 4 MP, dış mekân (IP66/67), gece için kızılötesi, <b>RTSP</b> yayın verebilmeli. Lens: <b>2,8 mm geniş açı</b> (3–6 m yükseklik için doğru seçim; 3 m'de ~7 m, 6 m'de ~14 m genişlik görür, kapı rahat sığar). Sabit lens yeterli, balık gözü ve döner (PTZ) kamera olmaz. Wi‑Fi ve yalnız buluttan çalışan kameralar (RTSP vermeyen) uygun değil.</td>
         <td>Hikvision DS‑2CD1043G0‑IUF ya da DS‑2CD2143G2‑I; Dahua eşdeğeri de olur</td>
         <td>₺2.300 – 4.000</td></tr>
     <tr><td><b>PoE güç</b></td>
@@ -168,17 +168,17 @@ a{color:var(--mavi)}
         <td>TP‑Link TL‑SF1006P (4 PoE port) ya da tek PoE enjektör</td>
         <td>₺600 – 2.500</td></tr>
     <tr><td><b>Kablo ve montaj</b></td>
-        <td>Dış mekân Cat6 kablo (en fazla 100 m), kapının üstüne 5–10 m yüksekte dik aşağı bakacak direk/konsol, kameranın 4 m yarıçaplı alanı görmesi yeterli.</td>
-        <td>30–50 m Cat6 dış mekân, galvaniz konsol</td>
-        <td>₺2.000 – 4.000 (tahmini)</td></tr>
-    <tr><td><b>Bilgisayar</b> — seçenek A</td>
-        <td>Windows dizüstü ya da masaüstü, <b>NVIDIA ekran kartı</b> (RTX 3050 ve üstü, en az 6 GB), 16 GB RAM, 512 GB disk. Saniyede 25+ kare işler, en rahat seçenek. Mevcut ekran kartlı bir PC varsa yenisine gerek yok.</td>
-        <td>Acer Nitro / HP Victus RTX 4060, i5‑i7, 16 GB</td>
-        <td>₺57.000 – 70.000 (var olan PC: ₺0)</td></tr>
-    <tr><td><b>Bilgisayar</b> — seçenek B</td>
-        <td>Apple Mac mini M4, 16 GB. Küçük, sessiz, az elektrik. Yazılım Mac'te de aynı şekilde çalışır.</td>
+        <td>Dış mekân Cat6 kablo (en fazla 100 m), kamera kapının tam üstüne, ahır kirişine ya da tavanına küçük bir konsolla 3–6 m yükseğe, dik aşağı bakacak şekilde takılır; direk gerekmez. Kapının her iki yanında 1–2 m boşluk görmesi yeterli.</td>
+        <td>30–50 m Cat6 dış mekân, kiriş/tavan konsolu</td>
+        <td>₺1.000 – 2.500 (tahmini)</td></tr>
+    <tr><td><b>Bilgisayar</b> — ÖNERİLEN<br><span class="rozet" style="margin-top:4px;background:var(--yesil-ac);color:var(--yesil)">kompakt</span></td>
+        <td>Apple Mac mini M4, 16 GB. Avuç içi boyutunda, sessiz, fansız denecek kadar az ısınır, 5–10 W çeker; ahırın yanındaki bir odaya ya da dolaba konur. Yazılım Mac'te hazır (tek tık <code>baslat.command</code>). Bu sayfadaki denemeler bir Mac'te yapıldı (M5 Max: saniyede 20 kare); M4'te tahmini 8–12 kare/sn, kapı sayımı için yeterli, kurulumda ölçülür. Tek Ethernet girişi var: kamera PoE anahtara, anahtar Mac'e; internet Wi‑Fi ile.</td>
         <td>Mac mini M4 16 GB / 256 GB</td>
         <td>₺40.000 – 48.000</td></tr>
+    <tr><td><b>Bilgisayar</b> — alternatif</td>
+        <td>Windows dizüstü ya da masaüstü, <b>NVIDIA ekran kartı</b> (RTX 3050 ve üstü, en az 6 GB), 16 GB RAM, 512 GB disk. Saniyede 25+ kare işler. Yalnızca elde zaten böyle bir PC varsa mantıklı (₺0); yeni alım için Mac mini daha ucuz ve küçük.</td>
+        <td>Acer Nitro / HP Victus RTX 4060, i5‑i7, 16 GB</td>
+        <td>₺57.000 – 70.000 (var olan PC: ₺0)</td></tr>
     <tr><td><b>Uygun olmayan</b></td>
         <td>Ucuz mini PC (Intel N100 / Celeron), Raspberry Pi, eski ofis bilgisayarı (ekran kartsız): gerçek zamanlı sayım için çok yavaş, kalabalık geçişte koyun kaçırır.</td>
         <td>—</td><td>—</td></tr>
@@ -187,14 +187,14 @@ a{color:var(--mavi)}
         <td>4G yönlendirici</td>
         <td>₺2.000 – 4.000 + hat (tahmini)</td></tr>
   </tbody>
-  <tfoot><tr><td colspan="3"><b>Toplam</b> (kamera + ağ + bilgisayar)</td><td><b>₺46.000 – 80.000</b><br><span style="font-weight:400;color:var(--sonuk)">yalnız kamera tarafı: ₺6.000 – 10.000</span></td></tr></tfoot>
+  <tfoot><tr><td colspan="3"><b>Toplam</b> (kamera + ağ + bilgisayar)</td><td><b>₺45.000 – 57.000</b> (Mac mini ile)<br><span style="font-weight:400;color:var(--sonuk)">yalnız kamera tarafı: ₺5.000 – 9.000 · mevcut PC varsa toplam da bu</span></td></tr></tfoot>
 </table>
 </div>
 
 <h2>Nasıl bağlanır</h2>
 <section class="adim">
-  <div class="kutu"><b>1. Kamera → kablo → PoE</b>Kamera kapının üstüne dik aşağı bakacak şekilde takılır. Tek Cat6 kablo kameradan PoE anahtara/enjektöre gelir; kamera gücünü bu kablodan alır, ayrı priz gerekmez.</div>
-  <div class="kutu"><b>2. PoE → bilgisayar</b>PoE anahtardan ikinci bir kablo bilgisayara (ya da mevcut modeme) gider. Kamera ve bilgisayar aynı yerel ağda olur; görüntü internete çıkmaz, bulut aboneliği yoktur.</div>
+  <div class="kutu"><b>1. Kamera → kablo → PoE</b>Kamera kapının tam üstüne, 3–6 m yüksekliğe, dik aşağı bakacak şekilde takılır (ahır kirişi yeterli). Tek Cat6 kablo kameradan PoE anahtara/enjektöre gelir; kamera gücünü bu kablodan alır, ayrı priz gerekmez.</div>
+  <div class="kutu"><b>2. PoE → bilgisayar</b>PoE anahtardan ikinci bir kablo Mac mini'nin Ethernet girişine (ya da mevcut modeme) gider. Kamera ve bilgisayar aynı yerel ağda olur; görüntü internete çıkmaz, bulut aboneliği yoktur.</div>
   <div class="kutu"><b>3. Programda kamera adresi</b>Programın Ayarlar bölümüne kameranın RTSP adresi yazılır (ör. <code>rtsp://kullanıcı:şifre@192.168.1.64:554/Streaming/Channels/101</code>), sayım çizgisi ekranda fareyle kapının üstüne çekilir. Bilgisayar açıldığında program kendiliğinden başlar.</div>
 </section>
 <section class="adim" style="margin-top:12px">
