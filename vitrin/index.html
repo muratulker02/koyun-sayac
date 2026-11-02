@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koyun Sayacı — Deneme Sonuçları</title>
+<meta name="description" content="Ağıl kapısının üstündeki kameradan geçen koyunları otomatik sayan sistemin deneme videoları ve sonuçları.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%90%91%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --zemin:#f6f4ef; --kart:#ffffff; --metin:#1e1e1e; --sonuk:#5f5f5f; --cizgi:#e4e0d6;
+  --yesil:#1f7a3a; --yesil-ac:#e6f4ea; --mavi:#0b63c6; --kirmizi:#c62828; --sari:#fff4d6;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--zemin);color:var(--metin);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow-x:hidden}
+.sayfa{max-width:1100px;margin:0 auto;padding:0 16px 48px}
+header{padding:36px 0 20px}
+h1{font-size:30px;line-height:1.15;margin:0 0 8px}
+.alt{color:var(--sonuk);font-size:17px;margin:0}
+h2{font-size:21px;margin:36px 0 12px}
+.ozet{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kutu{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;padding:18px}
+.kutu .buyuk{font-size:40px;font-weight:700;line-height:1;color:var(--yesil)}
+.kutu .buyuk small{font-size:20px;color:var(--sonuk);font-weight:600}
+.kutu p{margin:8px 0 0;color:var(--sonuk);font-size:15px}
+.kilavuz{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kilavuz .kutu ul{margin:8px 0 0;padding-left:18px}
+.kilavuz li{margin:4px 0}
+.renk{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:2px solid}
+.r-mavi{border-color:#00aaff}.r-yesil{border-color:#3cdc3c}.r-kirmizi{background:#e00;border-color:#e00}
+.demolar{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.demo{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;overflow:hidden}
+.demo video{display:block;width:100%;aspect-ratio:16/9;background:#000}
+.demo .govde{padding:14px 16px 16px}
+.demo h3{margin:0 0 6px;font-size:17px}
+.demo .aciklama{margin:0;color:var(--sonuk);font-size:14.5px}
+.sayilar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.sayi{border-radius:10px;padding:8px 12px;background:var(--zemin);min-width:88px}
+.sayi b{display:block;font-size:22px;line-height:1.1}
+.sayi span{font-size:12.5px;color:var(--sonuk)}
+.sayi.ok{background:var(--yesil-ac)}
+.sayi.ok b{color:var(--yesil)}
+.sayi.dikkat{background:var(--sari)}
+.rozet{display:inline-block;font-size:12.5px;padding:2px 8px;border-radius:999px;background:var(--zemin);color:var(--sonuk);margin-top:10px}
+.not{background:var(--sari);border-radius:14px;padding:16px 18px;border:1px solid #efe1b5}
+.not ul{margin:8px 0 0;padding-left:18px}
+.adim{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.adim .kutu b{display:block;font-size:17px;margin-bottom:4px}
+
+.yonetici{background:var(--kart);border:2px solid var(--yesil);border-radius:14px;padding:18px 20px;margin-top:4px}
+.yonetici ul{margin:0;padding-left:18px}
+.yonetici li{margin:6px 0}
+.tablo-sar{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--cizgi);border-radius:14px;background:var(--kart)}
+.tablo{width:100%;border-collapse:collapse;min-width:720px;font-size:14.5px}
+.tablo th,.tablo td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--cizgi)}
+.tablo th{background:var(--zemin);font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--sonuk)}
+.tablo td:last-child{white-space:nowrap;font-weight:600}
+.tablo tfoot td{border-bottom:0;background:var(--yesil-ac)}
+code{font-size:13px;background:var(--zemin);padding:1px 5px;border-radius:5px;word-break:break-all}
+
+@media (max-width:640px){
+  .tablo{min-width:0;font-size:15px}
+  .tablo thead{display:none}
+  .tablo,.tablo tbody,.tablo tfoot,.tablo tr,.tablo td{display:block;width:100%}
+  .tablo tr{border-bottom:8px solid var(--zemin);padding:6px 0}
+  .tablo td{border-bottom:0;padding:6px 14px}
+  .tablo td:last-child{white-space:normal}
+  .tablo tbody td::before{content:attr(data-label);display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--sonuk);margin-bottom:2px}
+  .tablo tbody td:first-child::before{display:none}
+  .tablo tbody td:first-child{font-size:17px;padding-top:10px}
+  .tablo tfoot td{background:var(--yesil-ac)}
+}
+footer{margin-top:40px;color:var(--sonuk);font-size:13.5px;border-top:1px solid var(--cizgi);padding-top:16px}
+a{color:var(--mavi)}
+@media (max-width:980px){.demolar{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){
+  h1{font-size:25px}
+  .ozet,.kilavuz,.adim,.demolar{grid-template-columns:1fr}
+  .kutu .buyuk{font-size:34px}
+  header{padding-top:24px}
+}
+</style>
+</head>
+<body>
+<div class="sayfa">
+<header>
+  <h1>Koyun Sayacı — Deneme Sonuçları</h1>
+  <p class="alt">Ağıl kapısının üstüne takılan bir kamera, kapıdan geçen koyunları tek tek sayar. Aşağıdaki videolar gerçek sürü görüntüleri üzerinde yapılan denemelerdir; sayılar videonun üstüne canlı olarak yazılmıştır.</p>
+</header>
+
+<section class="yonetici">
+  <h2 style="margin-top:0">Yönetici özeti</h2>
+  <ul>
+    <li><b>Ne yapar:</b> Ağıl kapısının üstündeki kameradan geçen koyunları tek tek sayar, günün giren/çıkan toplamını tutar, akşam Telegram'a özet gönderir ("700 çıktı, 698 girdi — 2 eksik").</li>
+    <li><b>Doğruluk:</b> Kaç koyun geçtiği kesin bilinen 4 videoda 160/160, aynı sürünün 5 farklı çekiminde 47/47, kahverengi keçi sürüsünde 84 (elle 83). Köpek ve insan sayılmaz.</li>
+    <li><b>Ne gerekir:</b> Kapının üstüne 1 adet PoE IP kamera, kablo ve PoE güç kaynağı, bir bilgisayar (ekran kartlı Windows PC ya da Mac mini). Yazılım hazır, lisans ücreti yok.</li>
+    <li><b>Maliyet (yaklaşık, Kasım 2026):</b> kamera + ağ malzemesi ₺6.000–10.000; bilgisayar ₺40.000–70.000 (mevcut ekran kartlı bir PC varsa ₺0). Toplam ₺46.000–80.000. Ayrıntı aşağıda.</li>
+    <li><b>Sonraki adım:</b> kamera takılır, ilk haftanın görüntüsüyle ağıla özel ince ayar yapılır, sonra günlük kullanıma geçilir. Kurulum yarım gün.</li>
+  </ul>
+</section>
+
+<section class="ozet" id="ozet">
+  <div class="kutu"><div class="buyuk">160 <small>/ 160</small></div><p>Kaç koyun geçtiği kesin bilinen 4 videoda sistem hepsini doğru saydı. Hata: 0.</p></div>
+  <div class="kutu"><div class="buyuk">47 <small>/ 47</small></div><p>Aynı 47 koyunluk sürü 5 ayrı videoda, 5 ile 10 metre arası farklı kamera yüksekliklerinde çekildi. Beşinde de sonuç 47.</p></div>
+  <div class="kutu"><div class="buyuk">84 <small>≈ 83</small></div><p>Kahverengi keçi sürüsünde elle sayım 83 (±3). Sistem 84 saydı. Araya giren iki insan sayılmadı.</p></div>
+</section>
+
+<h2>Videoyu nasıl okumalı</h2>
+<section class="kilavuz">
+  <div class="kutu">
+    <b>Ekrandaki işaretler</b>
+    <ul>
+      <li><span class="renk r-kirmizi"></span><b>Kırmızı çizgi</b>: sayım çizgisi. Bir koyun bu çizgiyi geçince sayılır.</li>
+      <li><span class="renk r-yesil"></span><b>Yeşil kutu</b>: tanındı, henüz çizgiyi geçmedi.</li>
+      <li><span class="renk r-mavi"></span><b>Mavi kutu</b>: çizgiyi geçti, sayıldı.</li>
+      <li>Köpek ve insan ayrıca etiketlenir, sayıma <b>girmez</b>.</li>
+    </ul>
+  </div>
+  <div class="kutu">
+    <b>Sol üstteki sayılar</b>
+    <ul>
+      <li><b>Büyük beyaz sayı</b>: sistemin o ana kadar saydığı koyun. Video bitince son değer okunur.</li>
+      <li><b>Gerçek sayı</b> (yeşil): videoda gerçekten kaç koyun geçtiği. İkisi eşitse sayım doğrudur.</li>
+      <li>Aynı koyun çizgide ileri geri gidip gelse bile bir kez sayılır.</li>
+    </ul>
+  </div>
+</section>
+
+<h2>Sayım denemeleri</h2>
+<section class="demolar" id="demolar"></section>
+
+<h2>Tanıma örnekleri (sayım çizgisi yok)</h2>
+<p class="alt" style="margin-bottom:12px">Bu iki videoda kapı yok, dolayısıyla sayım da yok. Yalnızca koyunların farklı mesafe ve ortamda tanındığını gösterir. Sol üstteki sayı o anda ekranda görünen koyun sayısıdır.</p>
+<section class="demolar" id="tanima"></section>
+
+<h2>Nerede zorlanır — açıkça</h2>
+<section class="not">
+  <ul>
+    <li><b>Kamera tepeden bakmalı.</b> Sistem kapının üstünden, dik aşağı bakan kameraya göre eğitildi. Yandan çekimde koyunlar birbirini kapattığı için kesin sayım hiçbir yöntemle güvenilir olmaz; yandan fotoğrafta "yaklaşık kaç koyun var" sorusuna cevap verir.</li>
+    <li><b>Her ağıl farklı.</b> Buradaki videolar Fransa'daki bir çiftlikten. Sizin kapınız, ışığınız ve kamera açınız farklı olacağı için kurulumdan sonra ilk haftanın görüntüsüyle kısa bir ince ayar yapılır. Bu beklenen bir adımdır.</li>
+    <li><b>Çok sıkışık geçişte</b> iki koyun üst üste binerse tek sayılabilir. Kapı genişliği ve kamera yüksekliği buna göre ayarlanır.</li>
+  </ul>
+</section>
+
+<h2>Çiftlikte nasıl çalışır</h2>
+<section class="adim">
+  <div class="kutu"><b>1. Kamera</b>Kapının tam üstüne, 5–10 m yüksekliğe, dik aşağı bakan bir kamera. Mevcut IP kamera kullanılabilir.</div>
+  <div class="kutu"><b>2. Bilgisayar</b>Kamera görüntüsünü izleyen bir bilgisayar (Windows ya da Mac). Günün giren ve çıkan sayısını tutar, videoyu kaydeder.</div>
+  <div class="kutu"><b>3. Telefona haber</b>Akşam belirlenen saatte Telegram'a özet gelir: "700 çıktı, 698 girdi — 2 eksik". Telefondan ya da tabletten anlık sayaç izlenir.</div>
+</section>
+
+
+<h2 id="donanim">Gerekli kamera ve bilgisayar — özellikler ve fiyat</h2>
+<p class="alt" style="margin-bottom:12px">Fiyatlar Kasım 2026 Türkiye fiyat karşılaştırma sitelerinden alınmış yaklaşık aralıklardır; satın almadan önce teklif alınmalıdır. Yazılımın kendisi için ücret yoktur.</p>
+
+<div class="tablo-sar">
+<table class="tablo">
+  <thead><tr><th>Parça</th><th>Ne olmalı</th><th>Örnek</th><th>Yaklaşık fiyat</th></tr></thead>
+  <tbody>
+    <tr><td><b>Kamera</b> (1 adet)</td>
+        <td>IP kamera, PoE (tek kabloyla hem güç hem görüntü), 4 MP, dış mekân (IP66/67), gece için kızılötesi, <b>RTSP</b> yayın verebilmeli. Lens: 5–6 m yükseklik için 2,8 mm; 8–10 m için 4 mm. Sabit lens yeterli, balık gözü ve döner (PTZ) kamera olmaz. Wi‑Fi ve yalnız buluttan çalışan kameralar (RTSP vermeyen) uygun değil.</td>
+        <td>Hikvision DS‑2CD1043G0‑IUF ya da DS‑2CD2143G2‑I; Dahua eşdeğeri de olur</td>
+        <td>₺2.300 – 4.000</td></tr>
+    <tr><td><b>PoE güç</b></td>
+        <td>Kameraya kablo üzerinden güç verir. Tek kamera için PoE enjektör, birden çok kamera düşünülüyorsa 4 portlu PoE anahtar (switch).</td>
+        <td>TP‑Link TL‑SF1006P (4 PoE port) ya da tek PoE enjektör</td>
+        <td>₺600 – 2.500</td></tr>
+    <tr><td><b>Kablo ve montaj</b></td>
+        <td>Dış mekân Cat6 kablo (en fazla 100 m), kapının üstüne 5–10 m yüksekte dik aşağı bakacak direk/konsol, kameranın 4 m yarıçaplı alanı görmesi yeterli.</td>
+        <td>30–50 m Cat6 dış mekân, galvaniz konsol</td>
+        <td>₺2.000 – 4.000 (tahmini)</td></tr>
+    <tr><td><b>Bilgisayar</b> — seçenek A</td>
+        <td>Windows dizüstü ya da masaüstü, <b>NVIDIA ekran kartı</b> (RTX 3050 ve üstü, en az 6 GB), 16 GB RAM, 512 GB disk. Saniyede 25+ kare işler, en rahat seçenek. Mevcut ekran kartlı bir PC varsa yenisine gerek yok.</td>
+        <td>Acer Nitro / HP Victus RTX 4060, i5‑i7, 16 GB</td>
+        <td>₺57.000 – 70.000 (var olan PC: ₺0)</td></tr>
+    <tr><td><b>Bilgisayar</b> — seçenek B</td>
+        <td>Apple Mac mini M4, 16 GB. Küçük, sessiz, az elektrik. Yazılım Mac'te de aynı şekilde çalışır.</td>
+        <td>Mac mini M4 16 GB / 256 GB</td>
+        <td>₺40.000 – 48.000</td></tr>
+    <tr><td><b>Uygun olmayan</b></td>
+        <td>Ucuz mini PC (Intel N100 / Celeron), Raspberry Pi, eski ofis bilgisayarı (ekran kartsız): gerçek zamanlı sayım için çok yavaş, kalabalık geçişte koyun kaçırır.</td>
+        <td>—</td><td>—</td></tr>
+    <tr><td><b>İnternet</b> (Telegram için)</td>
+        <td>Herhangi bir bağlantı yeter; ağılda internet yoksa 4G/5G yönlendirici + data hattı. Telegram mesajları çok az veri kullanır. İnternet kesilse sayım yerelde sürer.</td>
+        <td>4G yönlendirici</td>
+        <td>₺2.000 – 4.000 + hat (tahmini)</td></tr>
+  </tbody>
+  <tfoot><tr><td colspan="3"><b>Toplam</b> (kamera + ağ + bilgisayar)</td><td><b>₺46.000 – 80.000</b><br><span style="font-weight:400;color:var(--sonuk)">yalnız kamera tarafı: ₺6.000 – 10.000</span></td></tr></tfoot>
+</table>
+</div>
+
+<h2>Nasıl bağlanır</h2>
+<section class="adim">
+  <div class="kutu"><b>1. Kamera → kablo → PoE</b>Kamera kapının üstüne dik aşağı bakacak şekilde takılır. Tek Cat6 kablo kameradan PoE anahtara/enjektöre gelir; kamera gücünü bu kablodan alır, ayrı priz gerekmez.</div>
+  <div class="kutu"><b>2. PoE → bilgisayar</b>PoE anahtardan ikinci bir kablo bilgisayara (ya da mevcut modeme) gider. Kamera ve bilgisayar aynı yerel ağda olur; görüntü internete çıkmaz, bulut aboneliği yoktur.</div>
+  <div class="kutu"><b>3. Programda kamera adresi</b>Programın Ayarlar bölümüne kameranın RTSP adresi yazılır (ör. <code>rtsp://kullanıcı:şifre@192.168.1.64:554/Streaming/Channels/101</code>), sayım çizgisi ekranda fareyle kapının üstüne çekilir. Bilgisayar açıldığında program kendiliğinden başlar.</div>
+</section>
+<section class="adim" style="margin-top:12px">
+  <div class="kutu"><b>Ağıl ile ev/ofis uzaksa</b>Bilgisayar ağılda durmak zorunda değil: 100 m'ye kadar kablo, daha uzağa iki noktalı kablosuz köprü (TP‑Link CPE, çift ≈ ₺3.000) ile görüntü taşınır.</div>
+  <div class="kutu"><b>Kurulum süresi</b>Kamera montajı ve kablo yarım gün. Program kurulumu tek tıkla (Windows <code>kur.bat</code>, Mac <code>baslat.command</code>). İlk hafta görüntüsüyle ağıla özel ince ayar, ardından günlük kullanım.</div>
+  <div class="kutu"><b>Telefon ve tablet</b>Anlık sayaç ve günlük rapor aynı ağdaki telefon/tabletten tarayıcıyla izlenir; ayrı uygulama kurulmaz. Telegram'a akşam özeti ve eksik uyarısı gelir.</div>
+</section>
+
+<footer>
+  <p>Deneme görüntüleri: ICAERUS projesi (Fransa) açık veri seti, CC-BY lisansı. Sayım ayarları bütün videolarda aynıdır; hiçbir video için özel ayar yapılmamıştır. Hazırlayan: Murat Ülker · <span id="tarih"></span></p>
+</footer>
+</div>
+
+<script>
+const ACIKLAMA = {
+  "kapi-ustu-giris-3":    {sira:1, ad:"Kapının tam üstü, 5 metre",  not:"Koyunlar ağıldan çıkıyor. Kamera kapının tam üstünde."},
+  "kapi-ustu-giris-4":    {sira:2, ad:"Kapının tam üstü, 6 metre",  not:"Aynı sürü, biraz daha yüksekten. Koyunlar bu kez içeri giriyor."},
+  "kapi-ustu-giris-11":   {sira:3, ad:"Kapının tam üstü, 10 metre", not:"Aynı sürü, 10 metreden. Koyunlar ekranda küçük ama sayım değişmiyor."},
+  "tepeden-agila-giris-8":{sira:4, ad:"Ağıla giriş, drone ile #1",  not:"Drone kapının üstünde sabit duruyor. Sürü sıra hâlinde içeri giriyor."},
+  "tepeden-agila-giris-10":{sira:5, ad:"Ağıla giriş, drone ile #2", not:"Aynı sürünün başka bir günkü geçişi."},
+  "tepeden-agila-giris-12":{sira:6, ad:"Ağıla giriş, drone ile #3", not:"Sürü aralıklı giriyor; uzun duraklamalar var."},
+  "tepeden-agila-giris-13":{sira:7, ad:"Ağıla giriş, drone ile #4", not:"Hızlı ve sıkışık geçiş. En zor beyaz sürü videosu."},
+  "kopekli-suru-tepeden": {sira:8, ad:"Sürü ve çoban köpeği",       not:"Beyaz çoban köpeği sürüyle birlikte geçiyor. Köpek etiketlenir, sayılmaz."},
+  "kalabalik-suru-92":    {sira:9, ad:"Kahverengi keçi sürüsü",     not:"Kahverengi küçükbaş, farklı renk ve çevre. Gerçek sayı elle 83 (±3). İki insan geçiyor, sayılmıyor."},
+  "merada-dagnik-koyunlar":{sira:10, ad:"Merada dağınık koyunlar",  not:"Otlayan koyunlar, kapı yok."},
+  "tepeden-drone":        {sira:11, ad:"Uzaktan drone görüntüsü",   not:"Yüksekten, küçük görünen koyunlar."}
+};
+function kart(ad, s){
+  const a = ACIKLAMA[ad] || {ad: s.baslik, not: ""};
+  const sayimli = s.sayilan !== undefined;
+  let sayilar = "";
+  if (sayimli){
+    const hedef = s.gercek ?? s.gercek_yaklasik;
+    const yaklasik = s.gercek == null;
+    const fark = s.sayilan - hedef;
+    const sinif = yaklasik ? (Math.abs(fark) <= 3 ? "ok" : "dikkat") : (fark === 0 ? "ok" : "dikkat");
+    const farkMetin = yaklasik ? (Math.abs(fark) <= 3 ? "elle sayımla uyumlu" : (fark>0?"+":"")+fark)
+                               : (fark === 0 ? "hatasız" : (fark>0?"+":"")+fark);
+    sayilar = `<div class="sayilar">
+      <div class="sayi"><b>${yaklasik ? "≈" : ""}${hedef}</b><span>gerçek sayı</span></div>
+      <div class="sayi ${sinif}"><b>${s.sayilan}</b><span>sistem saydı</span></div>
+      <div class="sayi ${sinif}"><b>${sinif==="ok" ? "✓" : "!"}</b><span>${farkMetin}</span></div>
+    </div>`;
+  }
+  const model = s.model === "koyun-heracidan.pt" ? "Her açıdan modeli" : "Tepeden kapı modeli";
+  return `<article class="demo">
+    <video controls preload="none" playsinline poster="poster/${ad}.jpg" src="video/${ad}.mp4"></video>
+    <div class="govde">
+      <h3>${a.ad}</h3>
+      <p class="aciklama">${a.not}</p>
+      ${sayilar}
+      <span class="rozet">${s.sure_sn} sn · ${model}</span>
+    </div>
+  </article>`;
+}
+fetch("sonuc.json").then(r => r.json()).then(S => {
+  const adlar = Object.keys(S).sort((x,y) => (ACIKLAMA[x]?.sira ?? 99) - (ACIKLAMA[y]?.sira ?? 99));
+  document.getElementById("demolar").innerHTML = adlar.filter(a => S[a].sayilan !== undefined).map(a => kart(a, S[a])).join("");
+  document.getElementById("tanima").innerHTML  = adlar.filter(a => S[a].sayilan === undefined).map(a => kart(a, S[a])).join("");
+}).catch(() => { document.getElementById("demolar").innerHTML = "<p>Sonuçlar yüklenemedi.</p>"; });
+
+(() => { const b = [...document.querySelectorAll('.tablo thead th')].map(t => t.textContent);
+  document.querySelectorAll('.tablo tbody tr').forEach(tr => [...tr.children].forEach((td, i) => td.setAttribute('data-label', b[i] || ''))); })();
+document.getElementById("tarih").textContent = new Date().toLocaleDateString("tr-TR", {day:"numeric", month:"long", year:"numeric"});
+</script>
+</body>
+</html>
