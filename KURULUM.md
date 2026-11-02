@@ -45,7 +45,7 @@ Hiçbir şeye basmanız gerekmez. Ekranda:
 
 ## 5) Kamera kurulum kuralları
 
-1. Kamera **kapının tam üstünde, aşağı dik bakacak**, 4–5 m yükseklikte (4 mm lens ≈ 6 m genişlik görür).
+1. Kamera **kapının tam üstünde, aşağı dik bakacak**, 3–6 m yükseklikte (2,8 mm geniş açı lens: 3 m'de ≈ 7 m, 6 m'de ≈ 14 m genişlik görür). Alçak ahırda kirişe takılır, direk gerekmez.
 2. Kapı **1–2 koyun genişliğinde** daraltılırsa doğruluk en yüksek olur.
 3. Işık **yandan** (30–50 W LED projektör); kameraya doğru değil.
 4. Güneşlik; kamera gün doğumu/batımında güneşe bakmasın.
