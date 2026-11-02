@@ -74,6 +74,25 @@ baş sayımı: **83 küçükbaş (±3)**, 2 insan. "≈92" eski beyaz modelin k�
 
 Sonuç: elle 83, model 84 → %99; çizgi yeri sonucu değiştirmiyor.
 
+## Üçüncü model: `modeller/koyun-heracidan.pt` — HER AÇIDAN (2 Kas 03:30)
+
+Murat'ın hedefi: fotoğraf/videoda tepeden, yandan, yerden — her açıdan çalışan tek model. Eğitim seti 5.565 görüntü:
+önceki karışık set (2.873) + elimizdeki **tüm** ICAERUS videolarından yeni kareler (114 video, 1.256 kare; otomatik köpek
+etiketleri güvenilmez çıktı → silindi, köpek bilgisi elle temizlenmiş eski setten) + yandan/mera/uzak drone videoları
+(YOLO-World "sheep" etiketiyle) + **COCO 'sheep' 1.436 yerden/yandan fotoğraf**. 30 tur, karışık modelden ince ayar, M5 Max 4 sa.
+
+| Sınav | Beyaz sürü | Karışık (r2) | **Her açıdan (r3a)** |
+|---|---|---|---|
+| 4 bilinen video (160) | 160/160 | 159/160 | **160/160** |
+| Tam videolar (47'lik sürü, 5 video) | 47 | 47 | **47 / 47 / 47 / 47 / 47** |
+| Kahverengi keçi (elle 83) | 76, 20 şüpheli | 84 | **84** |
+| Köpekli sürü | köpeği sayar | 47 | **47, köpek sayılmaz** |
+| **Yandan/yerden COCO foto (158 foto, 943 koyun) mAP50** | 0,25 | 0,20 | **0,61** (P 0,70 R 0,55) |
+
+Karar: kapı kamerası için varsayılan beyaz sürü modeli kalır (Ayarlar'dan seçilebilir); **yüklenen fotoğraf/video her
+zaman her-açıdan modeliyle sayılır**; keçi/köpek demoları da onu kullanır. Sırada: 4. tur = + 56 GB yeni ICAERUS verisi
+(keçi video/foto 4,8 GB, çeşitli koşullar 22 + 29 GB; 4.767 dosya sözde etiket) → `veri/r4-rapor.txt`.
+
 ## Demo videoları yeniden kesildi (1 Kas öğleden sonra, Murat'ın gözlemi)
 Murat: "sayım çizgisi ortada, videolar fazla kırpılmış, koyunlar kenardan başlıyor". ICAERUS'un 4 kesiti (35/41/38/46) sürünün
 ortasından başlıyordu (ör. #1: koyunlar 33. sn'de giriyor, kesit 41. sn'de başlıyor; ilk karede 46 koyun, 4'ü çizgiyi geçmiş).

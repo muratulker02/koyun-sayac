@@ -1,0 +1,22 @@
+== 3. tur sınavı 02 Nov 03:27 ==
+-- 4 bilinen video (160): eski karışık model --
+video  8: gerçek  35  sayılan  35  (ters yön 0)
+video 10: gerçek  41  sayılan  41  (ters yön 0)
+video 12: gerçek  38  sayılan  38  (ters yön 0)
+video 13: gerçek  46  sayılan  45  (ters yön 0)
+TOPLAM: gerçek 160  sayılan 159  hata -1  doğruluk %99.4
+-- 4 bilinen video (160): YENİ r3 --
+video  8: gerçek  35  sayılan  35  (ters yön 0)
+video 10: gerçek  41  sayılan  41  (ters yön 0)
+video 12: gerçek  38  sayılan  38  (ters yön 0)
+video 13: gerçek  46  sayılan  46  (ters yön 0)
+TOPLAM: gerçek 160  sayılan 160  hata +0  doğruluk %100.0
+-- demolar (47 olmalı; keçi 83-84): YENİ r3 --
+kapi-ustu-giris-3  {"cikan": 47, "giren": 0, "kare": 369, "saniye": 18.4, "fps": 20.0}
+kapi-ustu-giris-4  {"cikan": 0, "giren": 47, "kare": 567, "saniye": 28.0, "fps": 20.2}
+kapi-ustu-giris-11  {"cikan": 47, "giren": 0, "kare": 622, "saniye": 30.7, "fps": 20.2}
+kopekli-suru-tepeden  {"cikan": 47, "giren": 0, "kare": 707, "saniye": 35.3, "fps": 20.0}
+tepeden-agila-giris-8  {"cikan": 0, "giren": 47, "kare": 436, "saniye": 21.9, "fps": 19.9}
+kalabalik-suru-92  {"cikan": 0, "giren": 84, "kare": 851, "saniye": 41.8, "fps": 20.4}
+-- val sınıf bazlı --
+R3_BITTI

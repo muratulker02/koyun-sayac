@@ -117,7 +117,15 @@ def main():
         _, cx, cy, bw, bh = map(float, s.split())
         return ((cx-bw/2)*w, (cy-bh/2)*h, (cx+bw/2)*w, (cy+bh/2)*h)
 
-    dosyalar = sorted(p for p in Path(a.kaynak).rglob("*") if p.suffix.lower() in UZ_VIDEO + UZ_FOTO)
+    import os
+    dosyalar = []
+    for kok, _, adlar in os.walk(a.kaynak, followlinks=True):   # sembolik bağlı klasörleri de izle (rglob izlemez)
+        for ad in adlar:
+            q = Path(kok) / ad
+            if q.suffix.lower() in UZ_VIDEO + UZ_FOTO:
+                dosyalar.append(q)
+    dosyalar.sort()
+    print("kaynak dosya:", len(dosyalar), flush=True)
     for d in dosyalar:
         if d.suffix.lower() in UZ_FOTO:
             img = cv2.imread(str(d))

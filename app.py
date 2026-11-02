@@ -33,6 +33,7 @@ VARSAYILAN = {"suru": 700, "tolerans": 0, "kamera": "", "cizgi": [0.5, 0, 0.5, 1
 MODELLER = {  # Ayarlar'daki seçenekler: dosya → açıklama
     "koyun-tepeden.pt": "Beyaz/açık renkli sürü (en hassas, 160/160)",
     "koyun-birlesik.pt": "Karışık sürü: koyun + keçi/koyu renk, köpek ve insanı ayırır",
+    "koyun-heracidan.pt": "Her açıdan: tepeden + yandan + yerden, koyun/keçi, köpek ve insanı ayırır (en kapsamlı)",
 }
 
 
@@ -405,7 +406,9 @@ def api_yukle():
     yol = YUKLENEN / ad
     f.save(yol)
     try:
-        sonuc = foto_say(model_yolu(), yol, YUKLENEN / (yol.stem + "-sonuc.jpg"))
+        # yüklenen foto/video herhangi bir açıdan olabilir → varsa her-açıdan modeli
+        her = KOK / "modeller" / "koyun-heracidan.pt"
+        sonuc = foto_say(str(her) if her.exists() else model_yolu(), yol, YUKLENEN / (yol.stem + "-sonuc.jpg"))
     except Exception as e:
         return jsonify({"hata": f"Sayılamadı: {e}"}), 400
     defter.sistem_log(f"YÜKLEME sayıldı: {ad} → {sonuc['sayi']} koyun")
