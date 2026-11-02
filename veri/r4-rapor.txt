@@ -1,0 +1,17 @@
+== 4. tur sınavı 02 Nov 07:16 ==
+-- koyun-tepeden: 4 bilinen video (160) --
+TOPLAM: gerçek 160  sayılan 160  hata +0  doğruluk %100.0
+-- koyun-birlesik: 4 bilinen video (160) --
+TOPLAM: gerçek 160  sayılan 159  hata -1  doğruluk %99.4
+-- birlesik-r3a: 4 bilinen video (160) --
+TOPLAM: gerçek 160  sayılan 160  hata +0  doğruluk %100.0
+-- birlesik-r4: 4 bilinen video (160) --
+TOPLAM: gerçek 160  sayılan 160  hata +0  doğruluk %100.0
+-- demolar (47; keçi 83-84): r4 --
+kapi-ustu-giris-3  {"cikan": 47, "giren": 0, "kare": 369, "saniye": 18.4, "fps": 20.1}
+kapi-ustu-giris-4  {"cikan": 0, "giren": 48, "kare": 567, "saniye": 28.1, "fps": 20.2}
+kapi-ustu-giris-11  {"cikan": 47, "giren": 0, "kare": 622, "saniye": 30.7, "fps": 20.2}
+kopekli-suru-tepeden  {"cikan": 47, "giren": 0, "kare": 707, "saniye": 35.1, "fps": 20.1}
+tepeden-agila-giris-8  {"cikan": 0, "giren": 47, "kare": 436, "saniye": 21.9, "fps": 19.9}
+kalabalik-suru-92  {"cikan": 0, "giren": 84, "kare": 851, "saniye": 41.7, "fps": 20.4}
+R4_BITTI

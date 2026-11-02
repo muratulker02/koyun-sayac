@@ -90,8 +90,9 @@ etiketleri güvenilmez çıktı → silindi, köpek bilgisi elle temizlenmiş es
 | **Yandan/yerden COCO foto (158 foto, 943 koyun) mAP50** | 0,25 | 0,20 | **0,61** (P 0,70 R 0,55) |
 
 Karar: kapı kamerası için varsayılan beyaz sürü modeli kalır (Ayarlar'dan seçilebilir); **yüklenen fotoğraf/video her
-zaman her-açıdan modeliyle sayılır**; keçi/köpek demoları da onu kullanır. Sırada: 4. tur = + 56 GB yeni ICAERUS verisi
-(keçi video/foto 4,8 GB, çeşitli koşullar 22 + 29 GB; 4.767 dosya sözde etiket) → `veri/r4-rapor.txt`.
+zaman her-açıdan modeliyle sayılır**; keçi/köpek demoları da onu kullanır. 4. tur (2 Kas 04:20–07:22): + 56 GB yeni ICAERUS verisi (4.767 dosya → 4.012 sözde etiketli kare; set 7.890/1.641), r3a modelinden
+15 tur. Sonuç: 160/160, demolar 47/**48**/47/47/47, keçi 84, COCO yandan mAP50 0,611 (r3a 0,613). **Daha iyi değil** →
+pakette `koyun-heracidan.pt` = r3a kalır; r4 `modeller/birlesik-r4.pt` olarak saklanır (`veri/r4-rapor.txt`).
 
 ## Demo videoları yeniden kesildi (1 Kas öğleden sonra, Murat'ın gözlemi)
 Murat: "sayım çizgisi ortada, videolar fazla kırpılmış, koyunlar kenardan başlıyor". ICAERUS'un 4 kesiti (35/41/38/46) sürünün
